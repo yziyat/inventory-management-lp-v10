@@ -32,6 +32,15 @@ export class AuthService {
   }
 
   /**
+   * Sign up a new user
+   */
+  async signUp(username: string, password: string, userData: Omit<User, 'id'>): Promise<User> {
+    // Convert username to email format if it's not already
+    const email = username.includes('@') ? username : `${username}@inventory-app.local`;
+    return this.firebaseAuth.signUp(email, password, userData);
+  }
+
+  /**
    * Logout current user
    */
   async logout(): Promise<void> {
