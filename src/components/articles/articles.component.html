@@ -2,153 +2,217 @@
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
     <h1 class="text-3xl font-bold text-gray-800">{{ t().articles.title }}</h1>
     <div class="flex items-center gap-2">
-      <button (click)="exportToExcel()" class="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 transition-colors shadow-sm text-sm font-medium">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+      <button (click)="exportToExcel()"
+        class="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 transition-colors shadow-sm text-sm font-medium">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+        </svg>
         {{ t().common.export }}
       </button>
-       @if (authService.isAdmin()) {
-        <input type="file" #fileInput hidden (change)="onFileChange($event)" accept=".xlsx, .xls">
-        <button (click)="fileInput.click()" class="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors shadow-sm hover:shadow-md text-sm font-medium">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-15 0V12m15 4.5V12m0 0-3.75-3.75M19.5 12h-15" /></svg>
-          {{ t().common.import }}
-        </button>
+      @if (authService.isAdmin()) {
+      <input type="file" #fileInput hidden (change)="onFileChange($event)" accept=".xlsx, .xls">
+      <button (click)="fileInput.click()"
+        class="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors shadow-sm hover:shadow-md text-sm font-medium">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-15 0V12m15 4.5V12m0 0-3.75-3.75M19.5 12h-15" />
+        </svg>
+        {{ t().common.import }}
+      </button>
       }
-       @if (authService.isAdmin() || authService.isEditor()) {
-        <button (click)="openAddModal()" class="flex items-center gap-2 px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors shadow-sm hover:shadow-md text-sm font-medium">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-          {{ t().articles.addArticle }}
-        </button>
+      @if (authService.isAdmin() || authService.isEditor()) {
+      <button (click)="openAddModal()"
+        class="flex items-center gap-2 px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors shadow-sm hover:shadow-md text-sm font-medium">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        {{ t().articles.addArticle }}
+      </button>
       }
     </div>
   </div>
 
   <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-      <input type="text" [placeholder]="t().articles.searchPlaceholder" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 md:col-span-2">
-      <select class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500" [value]="filterCategory()" (change)="onFilterCategoryChange($event)">
+      <input type="text" [placeholder]="t().articles.searchPlaceholder"
+        class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 md:col-span-2"
+        [value]="searchTerm()" (input)="onSearchTermChange($event)">
+      <select class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+        [value]="filterCategory()" (change)="onFilterCategoryChange($event)">
         <option value="">{{ t().articles.allCategories }}</option>
         @for (category of categories(); track category) {
-          <option [value]="category">{{ category }}</option>
+        <option [value]="category">{{ category }}</option>
         }
       </select>
     </div>
   </div>
 
-   <div class="flex justify-start items-center">
+  <div class="flex justify-start items-center">
     <div class="flex items-center gap-2">
       <span class="text-sm font-medium text-gray-700">{{ t().articles.pagination.show }}:</span>
-      <button (click)="setItemsPerPage(50)" class="px-3 py-1 text-sm rounded-md" [class.bg-sky-600]="itemsPerPage() === 50" [class.text-white]="itemsPerPage() === 50" [class.bg-gray-200]="itemsPerPage() !== 50">50</button>
-      <button (click)="setItemsPerPage(100)" class="px-3 py-1 text-sm rounded-md" [class.bg-sky-600]="itemsPerPage() === 100" [class.text-white]="itemsPerPage() === 100" [class.bg-gray-200]="itemsPerPage() !== 100">100</button>
-      <button (click)="setItemsPerPage(Infinity)" class="px-3 py-1 text-sm rounded-md" [class.bg-sky-600]="itemsPerPage() === Infinity" [class.text-white]="itemsPerPage() === Infinity" [class.bg-gray-200]="itemsPerPage() !== Infinity">{{ t().articles.pagination.all }}</button>
+      <button (click)="setItemsPerPage(50)" class="px-3 py-1 text-sm rounded-md"
+        [class.bg-sky-600]="itemsPerPage() === 50" [class.text-white]="itemsPerPage() === 50"
+        [class.bg-gray-200]="itemsPerPage() !== 50">50</button>
+      <button (click)="setItemsPerPage(100)" class="px-3 py-1 text-sm rounded-md"
+        [class.bg-sky-600]="itemsPerPage() === 100" [class.text-white]="itemsPerPage() === 100"
+        [class.bg-gray-200]="itemsPerPage() !== 100">100</button>
+      <button (click)="setItemsPerPage(Infinity)" class="px-3 py-1 text-sm rounded-md"
+        [class.bg-sky-600]="itemsPerPage() === Infinity" [class.text-white]="itemsPerPage() === Infinity"
+        [class.bg-gray-200]="itemsPerPage() !== Infinity">{{ t().articles.pagination.all }}</button>
     </div>
   </div>
 
   <div class="overflow-hidden bg-white rounded-xl shadow-md border border-gray-200">
     <div class="overflow-x-auto">
       <table class="w-full text-sm text-left text-gray-500">
-        <thead class="text-xs text-gray-500 uppercase bg-gray-50">
+        <thead class="text-xs text-white uppercase bg-slate-800">
           <tr>
-            <th scope="col" class="px-6 py-4" app-table-header [sortKey]="'name'" [activeSortKey]="sortKey()" [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().articles.table.name }}</th>
-            <th scope="col" class="px-6 py-4" app-table-header [sortKey]="'code'" [activeSortKey]="sortKey()" [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().articles.table.code }}</th>
-            <th scope="col" class="px-6 py-4" app-table-header [sortKey]="'category'" [activeSortKey]="sortKey()" [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().articles.table.category }}</th>
-            <th scope="col" class="px-6 py-4 text-right" app-table-header [sortKey]="'price'" [activeSortKey]="sortKey()" [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().articles.table.price }}</th>
-            <th scope="col" class="px-6 py-4 text-center" app-table-header [sortKey]="'alert'" [activeSortKey]="sortKey()" [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().articles.table.alert }}</th>
+            <th scope="col" class="px-6 py-4 w-24" app-table-header [sortKey]="'id'" [activeSortKey]="sortKey()"
+              [sortDirection]="sortDirection()" (sort)="handleSort($event)">ID</th>
+            <th scope="col" class="px-6 py-4" app-table-header [sortKey]="'name'" [activeSortKey]="sortKey()"
+              [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().articles.table.name }}</th>
+            <th scope="col" class="px-6 py-4 w-32" app-table-header [sortKey]="'code'" [activeSortKey]="sortKey()"
+              [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().articles.table.code }}</th>
+            <th scope="col" class="px-6 py-4 w-40" app-table-header [sortKey]="'category'" [activeSortKey]="sortKey()"
+              [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().articles.table.category }}</th>
+            <th scope="col" class="px-6 py-4 w-32 text-right" app-table-header [sortKey]="'price'"
+              [activeSortKey]="sortKey()" [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{
+              t().articles.table.price }}</th>
+            <th scope="col" class="px-6 py-4 w-24 text-center" app-table-header [sortKey]="'alert'"
+              [activeSortKey]="sortKey()" [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{
+              t().articles.table.alert }}</th>
             @if (authService.isAdmin() || authService.isEditor()) {
-              <th scope="col" class="px-6 py-4 text-center">{{ t().articles.table.actions }}</th>
+            <th scope="col" class="px-6 py-4 text-center">{{ t().articles.table.actions }}</th>
             }
           </tr>
         </thead>
         <tbody>
           @for (article of paginatedArticles(); track article.id) {
-            <tr class="bg-white border-b border-gray-200 hover:bg-gray-50">
-              <td class="px-6 py-4 font-medium text-gray-900 text-left">
-                <button (click)="openDetailModal(article)" class="text-sky-600 hover:underline text-left font-semibold">
-                  {{ article.name }}
-                </button>
-              </td>
-              <td class="px-6 py-4">{{ article.code }}</td>
-              <td class="px-6 py-4">{{ article.category }}</td>
-              <td class="px-6 py-4 text-right">{{ article.price.toFixed(2) }}</td>
-              <td class="px-6 py-4 text-center">{{ article.alert }}</td>
-               @if (authService.isAdmin() || authService.isEditor()) {
-                <td class="px-6 py-4">
-                   @if (authService.isAdmin()) {
-                    <div class="flex items-center justify-center gap-4">
-                      <button (click)="openEditModal(article)" [title]="t().common.edit" class="text-sky-600 hover:text-sky-800"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg></button>
-                      <button (click)="onDelete(article)" [title]="t().common.delete" class="text-red-600 hover:text-red-800"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg></button>
-                    </div>
-                  } @else if (authService.isEditor()) {
-                    <div class="flex items-center justify-center">
-                      <button (click)="openEditModal(article)" [title]="t().common.edit" class="text-sky-600 hover:text-sky-800"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg></button>
-                    </div>
-                  }
-                </td>
+          <tr class="bg-white border-b border-gray-200 hover:bg-gray-50">
+            <td class="px-6 py-4 text-gray-700">{{ article.id }}</td>
+            <td class="px-6 py-4 font-medium text-gray-900 text-left">
+              <button (click)="openDetailModal(article)" class="text-sky-600 hover:underline text-left font-semibold">
+                {{ article.name }}
+              </button>
+            </td>
+            <td class="px-6 py-4">{{ article.code }}</td>
+            <td class="px-6 py-4">{{ article.category }}</td>
+            <td class="px-6 py-4 text-right">{{ article.price.toFixed(2) }}</td>
+            <td class="px-6 py-4 text-center">{{ article.alert }}</td>
+            @if (authService.isAdmin() || authService.isEditor()) {
+            <td class="px-6 py-4">
+              @if (authService.isAdmin()) {
+              <div class="flex items-center justify-center gap-4">
+                <button (click)="openEditModal(article)" [title]="t().common.edit"
+                  class="text-sky-600 hover:text-sky-800"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                  </svg></button>
+                <button (click)="onDelete(article)" [title]="t().common.delete"
+                  class="text-red-600 hover:text-red-800"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                  </svg></button>
+              </div>
+              } @else if (authService.isEditor()) {
+              <div class="flex items-center justify-center">
+                <button (click)="openEditModal(article)" [title]="t().common.edit"
+                  class="text-sky-600 hover:text-sky-800"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                  </svg></button>
+              </div>
               }
-            </tr>
+            </td>
+            }
+          </tr>
           } @empty {
-            <tr>
-              <td [attr.colspan]="(authService.isAdmin() || authService.isEditor()) ? 6 : 5" class="px-6 py-12 text-center text-gray-500">{{ t().articles.noArticlesFound }}</td>
-            </tr>
+          <tr>
+            <td [attr.colspan]="(authService.isAdmin() || authService.isEditor()) ? 7 : 6"
+              class="px-6 py-12 text-center text-gray-500">{{ t().articles.noArticlesFound }}</td>
+          </tr>
           }
         </tbody>
       </table>
     </div>
     @if (filteredArticles().length > 0) {
-      <app-pagination 
-        [currentPage]="currentPage()" 
-        [totalItems]="filteredArticles().length"
-        [itemsPerPage]="itemsPerPage()"
-        (pageChange)="onPageChange($event)">
-        {{ paginationShowingText() }}
-      </app-pagination>
+    <app-pagination [currentPage]="currentPage()" [totalItems]="filteredArticles().length"
+      [itemsPerPage]="itemsPerPage()" (pageChange)="onPageChange($event)">
+      {{ paginationShowingText() }}
+    </app-pagination>
     }
   </div>
 </div>
 
-<app-modal [isOpen]="isModalOpen()" [title]="editingArticle() ? t().articles.editArticle : t().articles.addArticle" (close)="closeModal()">
+<app-modal [isOpen]="isModalOpen()" [title]="editingArticle() ? t().articles.editArticle : t().articles.addArticle"
+  (close)="closeModal()">
   <form [formGroup]="articleForm" (ngSubmit)="onSubmit()" class="space-y-4">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label for="name" class="block mb-2 text-sm font-medium text-gray-900">{{ t().articles.form.name.label }}</label>
-        <input type="text" id="name" formControlName="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+        <label for="name" class="block mb-2 text-sm font-medium text-gray-900">{{ t().articles.form.name.label
+          }}</label>
+        <input type="text" id="name" formControlName="name"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
       </div>
       <div>
-        <label for="code" class="block mb-2 text-sm font-medium text-gray-900">{{ t().articles.form.code.label }}</label>
-        <input type="text" id="code" formControlName="code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+        <label for="code" class="block mb-2 text-sm font-medium text-gray-900">{{ t().articles.form.code.label
+          }}</label>
+        <input type="text" id="code" formControlName="code"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
       </div>
     </div>
-     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label for="category" class="block mb-2 text-sm font-medium text-gray-900">{{ t().articles.form.category.label }}</label>
-        <select id="category" formControlName="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+        <label for="category" class="block mb-2 text-sm font-medium text-gray-900">{{ t().articles.form.category.label
+          }}</label>
+        <select id="category" formControlName="category"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
           <option value="" disabled>{{ t().articles.form.category.placeholder }}</option>
           @for (category of categories(); track category) {
-            <option [value]="category">{{ category }}</option>
+          <option [value]="category">{{ category }}</option>
           }
         </select>
       </div>
       <div>
-        <label for="unit" class="block mb-2 text-sm font-medium text-gray-900">{{ t().articles.form.unit.label }}</label>
-        <input type="text" id="unit" formControlName="unit" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+        <label for="unit" class="block mb-2 text-sm font-medium text-gray-900">{{ t().articles.form.unit.label
+          }}</label>
+        <input type="text" id="unit" formControlName="unit"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
       </div>
     </div>
-     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label for="price" class="block mb-2 text-sm font-medium text-gray-900">{{ t().articles.form.price.label }}</label>
-        <input type="number" id="price" formControlName="price" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+        <label for="price" class="block mb-2 text-sm font-medium text-gray-900">{{ t().articles.form.price.label
+          }}</label>
+        <input type="number" id="price" formControlName="price"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
       </div>
       <div>
-        <label for="alert" class="block mb-2 text-sm font-medium text-gray-900">{{ t().articles.form.alert.label }}</label>
-        <input type="number" id="alert" formControlName="alert" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+        <label for="alert" class="block mb-2 text-sm font-medium text-gray-900">{{ t().articles.form.alert.label
+          }}</label>
+        <input type="number" id="alert" formControlName="alert"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
       </div>
     </div>
     <div>
-      <label for="description" class="block mb-2 text-sm font-medium text-gray-900">{{ t().articles.form.description.label }}</label>
-      <textarea id="description" formControlName="description" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5"></textarea>
+      <label for="description" class="block mb-2 text-sm font-medium text-gray-900">{{
+        t().articles.form.description.label }}</label>
+      <textarea id="description" formControlName="description" rows="3"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5"></textarea>
     </div>
     <div class="flex justify-end gap-2 pt-4">
-      <button type="button" (click)="closeModal()" class="px-4 py-2 bg-white text-gray-800 border border-gray-300 rounded-md hover:bg-gray-100">{{ t().common.cancel }}</button>
-      <button type="submit" [disabled]="articleForm.invalid" class="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 disabled:bg-sky-300">
+      <button type="button" (click)="closeModal()"
+        class="px-4 py-2 bg-white text-gray-800 border border-gray-300 rounded-md hover:bg-gray-100">{{
+        t().common.cancel }}</button>
+      <button type="submit" [disabled]="articleForm.invalid"
+        class="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 disabled:bg-sky-300">
         {{ editingArticle() ? t().common.saveChanges : t().articles.createArticle }}
       </button>
     </div>
@@ -157,45 +221,50 @@
 
 <app-article-detail [article]="selectedArticle()" (close)="closeDetailModal()"></app-article-detail>
 
-<app-modal [isOpen]="isImportModalOpen()" [title]="t().articles.importArticles" (close)="closeImportModal()" modalClass="max-w-4xl">
+<app-modal [isOpen]="isImportModalOpen()" [title]="t().articles.importArticles" (close)="closeImportModal()"
+  modalClass="max-w-4xl">
   @if (importArticlesArray.length > 0) {
-    <h3 class="text-lg font-semibold mb-2">{{ t().articles.articlesToImport }} ({{ importArticlesArray.length }})</h3>
-    <p class="text-sm text-gray-600 mb-4">File: <span class="font-medium">{{ importFileName() }}</span></p>
-    <div class="max-h-[50vh] overflow-y-auto border rounded-lg">
-      <form [formGroup]="importForm">
-        <table class="w-full text-sm">
-          <thead class="bg-gray-100 sticky top-0">
-            <tr>
-              <th class="px-2 py-2 text-left">Name</th>
-              <th class="px-2 py-2 text-left">Code</th>
-              <th class="px-2 py-2 text-left">Category</th>
-              <th class="px-2 py-2 text-left">Unit</th>
-              <th class="px-2 py-2 text-right">Price</th>
-              <th class="px-2 py-2 text-right">Alert</th>
-            </tr>
-          </thead>
-          <tbody formArrayName="articles">
-            @for (articleGroup of importArticlesArray.controls; track $index) {
-              <tr [formGroupName]="$index" class="border-t">
-                <td class="p-1"><input formControlName="name" class="w-full p-1 border rounded-md"></td>
-                <td class="p-1"><input formControlName="code" class="w-full p-1 border rounded-md"></td>
-                <td class="p-1"><input formControlName="category" class="w-full p-1 border rounded-md"></td>
-                <td class="p-1"><input formControlName="unit" class="w-full p-1 border rounded-md"></td>
-                <td class="p-1"><input type="number" formControlName="price" class="w-full p-1 border rounded-md text-right"></td>
-                <td class="p-1"><input type="number" formControlName="alert" class="w-full p-1 border rounded-md text-right"></td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </form>
-    </div>
-    <div class="flex justify-end gap-2 pt-4">
-        <button type="button" (click)="closeImportModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">{{ t().common.cancel }}</button>
-        <button type="button" [disabled]="importForm.invalid" (click)="confirmImport()" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-300">
-            {{ t().articles.confirmImport }}
-        </button>
-    </div>
+  <h3 class="text-lg font-semibold mb-2">{{ t().articles.articlesToImport }} ({{ importArticlesArray.length }})</h3>
+  <p class="text-sm text-gray-600 mb-4">File: <span class="font-medium">{{ importFileName() }}</span></p>
+  <div class="max-h-[50vh] overflow-y-auto border rounded-lg">
+    <form [formGroup]="importForm">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-100 sticky top-0">
+          <tr>
+            <th class="px-2 py-2 text-left">Name</th>
+            <th class="px-2 py-2 text-left">Code</th>
+            <th class="px-2 py-2 text-left">Category</th>
+            <th class="px-2 py-2 text-left">Unit</th>
+            <th class="px-2 py-2 text-right">Price</th>
+            <th class="px-2 py-2 text-right">Alert</th>
+          </tr>
+        </thead>
+        <tbody formArrayName="articles">
+          @for (articleGroup of importArticlesArray.controls; track $index) {
+          <tr [formGroupName]="$index" class="border-t">
+            <td class="p-1"><input formControlName="name" class="w-full p-1 border rounded-md"></td>
+            <td class="p-1"><input formControlName="code" class="w-full p-1 border rounded-md"></td>
+            <td class="p-1"><input formControlName="category" class="w-full p-1 border rounded-md"></td>
+            <td class="p-1"><input formControlName="unit" class="w-full p-1 border rounded-md"></td>
+            <td class="p-1"><input type="number" formControlName="price"
+                class="w-full p-1 border rounded-md text-right"></td>
+            <td class="p-1"><input type="number" formControlName="alert"
+                class="w-full p-1 border rounded-md text-right"></td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </form>
+  </div>
+  <div class="flex justify-end gap-2 pt-4">
+    <button type="button" (click)="closeImportModal()"
+      class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">{{ t().common.cancel }}</button>
+    <button type="button" [disabled]="importForm.invalid" (click)="confirmImport()"
+      class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-300">
+      {{ t().articles.confirmImport }}
+    </button>
+  </div>
   } @else {
-    <p class="text-center text-gray-500 py-8">{{ t().articles.importInstructions }}</p>
+  <p class="text-center text-gray-500 py-8">{{ t().articles.importInstructions }}</p>
   }
 </app-modal>

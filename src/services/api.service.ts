@@ -57,7 +57,7 @@ export class ApiService {
         this._movements.set([]);
         this._users.set([]);
       }
-    });
+    }, { allowSignalWrites: true });
   }
 
   private stopFirestoreListeners(): void {

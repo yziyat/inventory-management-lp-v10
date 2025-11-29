@@ -1,212 +1,288 @@
 <div class="space-y-6">
   <h1 class="text-3xl font-bold text-gray-800">{{ t().movements.title }}</h1>
-  
+
   @if (authService.isAdmin() || authService.isEditor()) {
-    <div class="flex flex-col sm:flex-row items-center gap-4">
-        <button (click)="toggleSingleForm()" class="w-full sm:w-auto flex-1 px-4 py-2.5 bg-sky-600 text-white font-semibold rounded-md hover:bg-sky-700 transition-colors shadow-sm text-sm flex items-center justify-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
-            {{ t().movements.recordMovement }}
-        </button>
-         <button (click)="toggleBulkForm()" class="w-full sm:w-auto flex-1 px-4 py-2.5 bg-teal-600 text-white font-semibold rounded-md hover:bg-teal-700 transition-colors shadow-sm text-sm flex items-center justify-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" /></svg>
-            {{ t().movements.bulkForm.title }}
-        </button>
+  <div class="flex flex-col sm:flex-row items-center gap-4">
+    <button (click)="toggleSingleForm()"
+      class="w-full sm:w-auto flex-1 px-4 py-2.5 bg-sky-600 text-white font-semibold rounded-md hover:bg-sky-700 transition-colors shadow-sm text-sm flex items-center justify-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+        class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+      </svg>
+      {{ t().movements.recordMovement }}
+    </button>
+    <button (click)="toggleBulkForm()"
+      class="w-full sm:w-auto flex-1 px-4 py-2.5 bg-teal-600 text-white font-semibold rounded-md hover:bg-teal-700 transition-colors shadow-sm text-sm flex items-center justify-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+        class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+      </svg>
+      {{ t().movements.bulkForm.title }}
+    </button>
+  </div>
+
+  <!-- Single Movement Form -->
+  @if(isSingleFormVisible()) {
+  <div class="bg-white p-6 rounded-xl shadow-md border border-sky-200">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-semibold text-gray-800">{{ t().movements.recordMovement }}</h2>
+      @if (singleFormSelectedArticleStock(); as stockInfo) {
+      <span class="text-sm text-gray-500 font-medium">{{ t().movements.form.inStock }}: {{ stockInfo.stock }} {{
+        stockInfo.unit }}</span>
+      }
     </div>
+    <form [formGroup]="movementForm" (ngSubmit)="onSingleSubmit()"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+      <div class="lg:col-span-2">
+        <label for="article" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.article.label
+          }}</label>
+        <app-searchable-select formControlName="articleId" [options]="searchableArticles()"
+          [placeholder]="t().movements.form.article.placeholder">
+        </app-searchable-select>
+      </div>
+      <div>
+        <label for="type" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.type.label
+          }}</label>
+        <select id="type" formControlName="type"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+          @for (type of movementTypes; track type) {
+          <option [value]="type">{{ t().movements.types[type] || type }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label for="quantity" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.quantity.label
+          }}</label>
+        <input type="number" id="quantity" formControlName="quantity"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+      </div>
+      <div>
+        <label for="date" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.date.label
+          }}</label>
+        <input type="date" id="date" formControlName="date" [max]="today"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+      </div>
+      <div>
+        <label for="refDoc" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.refDoc.label
+          }}</label>
+        <input type="text" id="refDoc" formControlName="refDoc"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+      </div>
+      <div>
+        <label for="supplierDest" class="block mb-2 text-sm font-medium text-gray-900">{{
+          movementForm.get('type')?.value === 'Entrée' ? t().movements.form.supplier.label :
+          t().movements.form.destination.label }}</label>
+        <select id="supplierDest" formControlName="supplierDest"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+          <option value="">{{ movementForm.get('type')?.value === 'Entrée' ? t().movements.form.supplier.placeholder :
+            t().movements.form.destination.placeholder }}</option>
+          @for (item of supplierDestinationsList(); track item) {
+          <option [value]="item">{{ item }}</option>
+          }
+        </select>
+      </div>
+      @if (movementForm.get('type')?.value === 'Sortie' || movementForm.get('type')?.value === 'Périmé / Rebut') {
+      <div>
+        <label for="subcategory" class="block mb-2 text-sm font-medium text-gray-900">{{
+          t().movements.form.subcategory.label }}</label>
+        <select id="subcategory" formControlName="subcategory"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+          <option value="">{{ t().movements.form.subcategory.placeholder }}</option>
+          @for (sub of outgoingSubcategories(); track sub) {
+          <option [value]="sub">{{ sub }}</option>
+          }
+        </select>
+      </div>
+      }
+      <div class="lg:col-span-2">
+        <label for="remarks" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.remarks.label
+          }}</label>
+        <input type="text" id="remarks" formControlName="remarks"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+      </div>
+      <div class="col-span-full lg:col-span-1 flex items-end gap-2">
+        <button type="submit" [disabled]="movementForm.invalid"
+          class="flex-grow px-4 py-2.5 bg-sky-600 text-white font-semibold rounded-md hover:bg-sky-700 disabled:bg-sky-300 transition-colors shadow-sm text-sm">
+          {{ t().movements.saveMovement }}
+        </button>
+        <button type="button" (click)="isSingleFormVisible.set(false)"
+          class="px-4 py-2.5 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors text-sm">
+          {{ t().common.cancel }}
+        </button>
+      </div>
+    </form>
+  </div>
+  }
 
-    <!-- Single Movement Form -->
-    @if(isSingleFormVisible()) {
-        <div class="bg-white p-6 rounded-xl shadow-md border border-sky-200">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold text-gray-800">{{ t().movements.recordMovement }}</h2>
-            @if (singleFormSelectedArticleStock(); as stockInfo) {
-              <span class="text-sm text-gray-500 font-medium">{{ t().movements.form.inStock }}: {{ stockInfo.stock }} {{ stockInfo.unit }}</span>
+  <!-- Bulk Movement Form -->
+  @if(isBulkFormVisible()) {
+  <div class="bg-white p-6 rounded-xl shadow-md border border-teal-200">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-semibold text-gray-800">{{ t().movements.bulkForm.title }}</h2>
+      @if (bulkFormSelectedArticleStock(); as stockInfo) {
+      <span class="text-sm text-gray-500 font-medium">{{ t().movements.form.inStock }}: {{ stockInfo.stock }} {{
+        stockInfo.unit }}</span>
+      }
+    </div>
+    <form [formGroup]="bulkMovementForm" (ngSubmit)="onBulkSubmit()">
+      <!-- Common fields -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label for="bulk-article" class="block mb-2 text-sm font-medium text-gray-900">{{
+            t().movements.form.article.label }}</label>
+          <app-searchable-select formControlName="articleId" [options]="searchableArticles()"
+            [placeholder]="t().movements.form.article.placeholder">
+          </app-searchable-select>
+        </div>
+        <div>
+          <label for="bulk-date" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.date.label
+            }}</label>
+          <input type="date" id="bulk-date" formControlName="date" [max]="today"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+        </div>
+        <div>
+          <label for="bulk-type" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.type.label
+            }}</label>
+          <select id="bulk-type" formControlName="type"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+            @for (type of movementTypes; track type) {
+            <option [value]="type">{{ t().movements.types[type] || type }}</option>
             }
+          </select>
+        </div>
+      </div>
+
+      <!-- Dynamic rows -->
+      <div formArrayName="movements" class="space-y-3">
+        @for (movementGroup of bulkMovementsArray.controls; track i; let i = $index) {
+        <div [formGroupName]="i" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center bg-gray-50 p-2 rounded-md">
+          <div class="col-span-full md:col-span-2">
+            <label class="block text-xs font-medium text-gray-700 mb-1">{{ t().movements.form.quantity.label }}</label>
+            <input type="number" formControlName="quantity"
+              class="w-full p-2 border border-gray-300 rounded-md text-sm">
           </div>
-          <form [formGroup]="movementForm" (ngSubmit)="onSingleSubmit()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-              <div class="lg:col-span-2">
-                  <label for="article" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.article.label }}</label>
-                  <app-searchable-select 
-                    formControlName="articleId"
-                    [options]="searchableArticles()"
-                    [placeholder]="t().movements.form.article.placeholder">
-                </app-searchable-select>
-              </div>
-              <div>
-                  <label for="type" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.type.label }}</label>
-                  <select id="type" formControlName="type" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                       @for (type of movementTypes; track type) {
-                          <option [value]="type">{{ t().movements.types[type] || type }}</option>
-                      }
-                  </select>
-              </div>
-               <div>
-                  <label for="quantity" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.quantity.label }}</label>
-                  <input type="number" id="quantity" formControlName="quantity" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-              </div>
-              <div>
-                  <label for="date" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.date.label }}</label>
-                  <input type="date" id="date" formControlName="date" [max]="today" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-              </div>
-              <div>
-                  <label for="refDoc" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.refDoc.label }}</label>
-                  <input type="text" id="refDoc" formControlName="refDoc" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-              </div>
-              <div>
-                  <label for="supplierDest" class="block mb-2 text-sm font-medium text-gray-900">{{ movementForm.get('type')?.value === 'Entrée' ? t().movements.form.supplier.label : t().movements.form.destination.label }}</label>
-                  <select id="supplierDest" formControlName="supplierDest" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                      <option value="">{{ movementForm.get('type')?.value === 'Entrée' ? t().movements.form.supplier.placeholder : t().movements.form.destination.placeholder }}</option>
-                      @for (item of supplierDestinationsList(); track item) {
-                          <option [value]="item">{{ item }}</option>
-                      }
-                  </select>
-              </div>
-              @if (movementForm.get('type')?.value === 'Sortie' || movementForm.get('type')?.value === 'Périmé / Rebut') {
-                 <div>
-                  <label for="subcategory" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.subcategory.label }}</label>
-                  <select id="subcategory" formControlName="subcategory" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                      <option value="">{{ t().movements.form.subcategory.placeholder }}</option>
-                      @for (sub of outgoingSubcategories(); track sub) {
-                          <option [value]="sub">{{ sub }}</option>
-                      }
-                  </select>
-                </div>
+          <div class="col-span-full md:col-span-4">
+            <label class="block text-xs font-medium text-gray-700 mb-1">{{ bulkMovementForm.get('type')?.value ===
+              'Entrée' ? t().movements.form.supplier.label : t().movements.form.destination.label }}</label>
+            <select formControlName="supplierDest"
+              class="w-full p-2 border border-gray-300 rounded-md text-sm bg-white">
+              <option value="">{{ bulkMovementForm.get('type')?.value === 'Entrée' ?
+                t().movements.form.supplier.placeholder : t().movements.form.destination.placeholder }}</option>
+              @for (item of bulkSupplierDestinationsList(); track item) {
+              <option [value]="item">{{ item }}</option>
               }
-              <div class="lg:col-span-2">
-                   <label for="remarks" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.remarks.label }}</label>
-                   <input type="text" id="remarks" formControlName="remarks" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-              </div>
-              <div class="col-span-full lg:col-span-1 flex items-end gap-2">
-                  <button type="submit" [disabled]="movementForm.invalid" class="flex-grow px-4 py-2.5 bg-sky-600 text-white font-semibold rounded-md hover:bg-sky-700 disabled:bg-sky-300 transition-colors shadow-sm text-sm">
-                      {{ t().movements.saveMovement }}
-                  </button>
-                  <button type="button" (click)="isSingleFormVisible.set(false)" class="px-4 py-2.5 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors text-sm">
-                    {{ t().common.cancel }}
-                </button>
-              </div>
-          </form>
+            </select>
+          </div>
+          <div class="col-span-full md:col-span-5">
+            <label class="block text-xs font-medium text-gray-700 mb-1">{{ t().movements.form.remarks.label }}</label>
+            <input type="text" formControlName="remarks" class="w-full p-2 border border-gray-300 rounded-md text-sm">
+          </div>
+          <div class="col-span-full md:col-span-1 flex justify-end">
+            <label class="block text-xs font-medium text-gray-700 mb-1 opacity-0 md:hidden">Del</label>
+            <button type="button" (click)="removeBulkMovementRow(i)" [disabled]="bulkMovementsArray.length <= 1"
+              class="text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+              </svg>
+            </button>
+          </div>
         </div>
-    }
-
-    <!-- Bulk Movement Form -->
-     @if(isBulkFormVisible()) {
-        <div class="bg-white p-6 rounded-xl shadow-md border border-teal-200">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-semibold text-gray-800">{{ t().movements.bulkForm.title }}</h2>
-               @if (bulkFormSelectedArticleStock(); as stockInfo) {
-                <span class="text-sm text-gray-500 font-medium">{{ t().movements.form.inStock }}: {{ stockInfo.stock }} {{ stockInfo.unit }}</span>
-              }
-            </div>
-            <form [formGroup]="bulkMovementForm" (ngSubmit)="onBulkSubmit()">
-                <!-- Common fields -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div>
-                        <label for="bulk-article" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.article.label }}</label>
-                         <app-searchable-select 
-                            formControlName="articleId"
-                            [options]="searchableArticles()"
-                            [placeholder]="t().movements.form.article.placeholder">
-                        </app-searchable-select>
-                    </div>
-                     <div>
-                        <label for="bulk-date" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.date.label }}</label>
-                        <input type="date" id="bulk-date" formControlName="date" [max]="today" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                    </div>
-                    <div>
-                        <label for="bulk-type" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.type.label }}</label>
-                        <select id="bulk-type" formControlName="type" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                             @for (type of movementTypes; track type) {
-                                <option [value]="type">{{ t().movements.types[type] || type }}</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Dynamic rows -->
-                <div formArrayName="movements" class="space-y-3">
-                    @for (movementGroup of bulkMovementsArray.controls; track i; let i = $index) {
-                        <div [formGroupName]="i" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center bg-gray-50 p-2 rounded-md">
-                            <div class="col-span-full md:col-span-2">
-                                <label class="block text-xs font-medium text-gray-700 mb-1">{{ t().movements.form.quantity.label }}</label>
-                                <input type="number" formControlName="quantity" class="w-full p-2 border border-gray-300 rounded-md text-sm">
-                            </div>
-                            <div class="col-span-full md:col-span-4">
-                                <label class="block text-xs font-medium text-gray-700 mb-1">{{ bulkMovementForm.get('type')?.value === 'Entrée' ? t().movements.form.supplier.label : t().movements.form.destination.label }}</label>
-                                 <select formControlName="supplierDest" class="w-full p-2 border border-gray-300 rounded-md text-sm bg-white">
-                                    <option value="">{{ bulkMovementForm.get('type')?.value === 'Entrée' ? t().movements.form.supplier.placeholder : t().movements.form.destination.placeholder }}</option>
-                                    @for (item of bulkSupplierDestinationsList(); track item) {
-                                        <option [value]="item">{{ item }}</option>
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-span-full md:col-span-5">
-                                <label class="block text-xs font-medium text-gray-700 mb-1">{{ t().movements.form.remarks.label }}</label>
-                                <input type="text" formControlName="remarks" class="w-full p-2 border border-gray-300 rounded-md text-sm">
-                            </div>
-                            <div class="col-span-full md:col-span-1 flex justify-end">
-                                <label class="block text-xs font-medium text-gray-700 mb-1 opacity-0 md:hidden">Del</label>
-                                <button type="button" (click)="removeBulkMovementRow(i)" [disabled]="bulkMovementsArray.length <= 1" class="text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
-                                </button>
-                            </div>
-                        </div>
-                    }
-                </div>
-                 @if (bulkMovementsArray.hasError('duplicateDestinations') && bulkMovementsArray.dirty) {
-                    <div class="text-red-600 text-sm mt-3 text-center">
-                        {{ t().movements.bulkForm.duplicateDestination }}
-                    </div>
-                }
-                 <div class="flex items-center justify-between mt-4">
-                     <button type="button" (click)="addBulkMovementRow()" class="flex items-center gap-2 text-sm text-sky-600 font-semibold hover:text-sky-800">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-                        {{ t().movements.bulkForm.addRow }}
-                    </button>
-                    <div class="flex items-center gap-2">
-                        <button type="button" (click)="isBulkFormVisible.set(false)" class="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors text-sm">
-                            {{ t().common.cancel }}
-                        </button>
-                        <button type="submit" [disabled]="bulkMovementForm.invalid" class="px-6 py-2 bg-teal-600 text-white font-semibold rounded-md hover:bg-teal-700 disabled:bg-teal-300 transition-colors shadow-sm text-sm">
-                            {{ t().movements.saveMovement }}
-                        </button>
-                    </div>
-                 </div>
-            </form>
+        }
+      </div>
+      @if (bulkMovementsArray.hasError('duplicateDestinations') && bulkMovementsArray.dirty) {
+      <div class="text-red-600 text-sm mt-3 text-center">
+        {{ t().movements.bulkForm.duplicateDestination }}
+      </div>
+      }
+      <div class="flex items-center justify-between mt-4">
+        <button type="button" (click)="addBulkMovementRow()"
+          class="flex items-center gap-2 text-sm text-sky-600 font-semibold hover:text-sky-800">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+            class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+          {{ t().movements.bulkForm.addRow }}
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" (click)="isBulkFormVisible.set(false)"
+            class="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors text-sm">
+            {{ t().common.cancel }}
+          </button>
+          <button type="submit" [disabled]="bulkMovementForm.invalid"
+            class="px-6 py-2 bg-teal-600 text-white font-semibold rounded-md hover:bg-teal-700 disabled:bg-teal-300 transition-colors shadow-sm text-sm">
+            {{ t().movements.saveMovement }}
+          </button>
         </div>
-    }
+      </div>
+    </form>
+  </div>
+  }
   }
 
   <div class="space-y-4">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
       <h2 class="text-xl font-semibold text-gray-800">{{ t().movements.history }}</h2>
-      <button (click)="exportToExcel()" class="flex items-center gap-2 px-3 py-1.5 bg-white text-gray-700 border border-gray-300 text-xs rounded-md hover:bg-gray-100 transition-colors shadow-sm mt-2 sm:mt-0">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+      <button (click)="exportToExcel()"
+        class="flex items-center gap-2 px-3 py-1.5 bg-white text-gray-700 border border-gray-300 text-xs rounded-md hover:bg-gray-100 transition-colors shadow-sm mt-2 sm:mt-0">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+        </svg>
         {{ t().common.export }}
       </button>
     </div>
     <div [formGroup]="filterForm" class="bg-white p-4 rounded-xl shadow-md border border-gray-200 text-sm">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
-        <input type="date" formControlName="startDate" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500" [placeholder]="t().movements.filters.startDate">
-        <input type="date" formControlName="endDate" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500" [placeholder]="t().movements.filters.endDate">
-        <input type="text" formControlName="articleSearch" [placeholder]="t().movements.filters.articleSearch" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 lg:col-span-2">
-        <select formControlName="type" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500">
-            <option value="">{{ t().movements.filters.allTypes }}</option>
-            @for (type of movementTypes; track type) {
-                <option [value]="type">{{ t().movements.types[type] || type }}</option>
-            }
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
+        <input type="date" formControlName="startDate"
+          class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+          [placeholder]="t().movements.filters.startDate">
+        <input type="date" formControlName="endDate"
+          class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+          [placeholder]="t().movements.filters.endDate">
+        <input type="text" formControlName="articleSearch" [placeholder]="t().movements.filters.articleSearch"
+          class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 lg:col-span-2">
+        <select formControlName="type"
+          class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500">
+          <option value="">{{ t().movements.filters.allTypes }}</option>
+          @for (type of movementTypes; track type) {
+          <option [value]="type">{{ t().movements.types[type] || type }}</option>
+          }
         </select>
-        <select formControlName="supplierDest" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500">
-            <option value="">{{ t().movements.filters.allDestinations }}</option>
-            @for (dest of allSuppliersAndDestinations(); track dest) {
-                <option [value]="dest">{{ dest }}</option>
-            }
+        <select formControlName="supplier"
+          class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+          aria-label="Filter by supplier">
+          <option value="">{{ t().movements.filters.allSuppliers || 'Tous les fournisseurs' }}</option>
+          @for (supplier of suppliers(); track supplier) {
+          <option [value]="supplier">{{ supplier }}</option>
+          }
+        </select>
+        <select formControlName="destination"
+          class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+          aria-label="Filter by destination">
+          <option value="">{{ t().movements.filters.allDestinations }}</option>
+          @for (dest of destinations(); track dest) {
+          <option [value]="dest">{{ dest }}</option>
+          }
         </select>
         <div class="flex gap-2">
-            <button (click)="applyFilters()" class="w-full px-3 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 flex items-center justify-center gap-2">
-                {{ t().common.apply }}
-            </button>
-            <button (click)="resetFilters()" class="px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 flex items-center justify-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 11.667 0l3.181-3.183m-4.991-2.691v4.992m0 0h-4.992m4.992 0-3.181-3.183a8.25 8.25 0 0 0-11.667 0L2.985 16.644Z" /></svg>
-            </button>
+          <button (click)="applyFilters()"
+            class="w-full px-3 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 flex items-center justify-center gap-2">
+            {{ t().common.apply }}
+          </button>
+          <button (click)="resetFilters()"
+            class="px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 11.667 0l3.181-3.183m-4.991-2.691v4.992m0 0h-4.992m4.992 0-3.181-3.183a8.25 8.25 0 0 0-11.667 0L2.985 16.644Z" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
@@ -215,83 +291,102 @@
   <div class="flex justify-start items-center">
     <div class="flex items-center gap-2">
       <span class="text-sm font-medium text-gray-700">{{ t().articles.pagination.show }}:</span>
-      <button (click)="setItemsPerPage(50)" class="px-3 py-1 text-sm rounded-md" [class.bg-sky-600]="itemsPerPage() === 50" [class.text-white]="itemsPerPage() === 50" [class.bg-gray-200]="itemsPerPage() !== 50">50</button>
-      <button (click)="setItemsPerPage(100)" class="px-3 py-1 text-sm rounded-md" [class.bg-sky-600]="itemsPerPage() === 100" [class.text-white]="itemsPerPage() === 100" [class.bg-gray-200]="itemsPerPage() !== 100">100</button>
-      <button (click)="setItemsPerPage(Infinity)" class="px-3 py-1 text-sm rounded-md" [class.bg-sky-600]="itemsPerPage() === Infinity" [class.text-white]="itemsPerPage() === Infinity" [class.bg-gray-200]="itemsPerPage() !== Infinity">{{ t().articles.pagination.all }}</button>
+      <button (click)="setItemsPerPage(50)" class="px-3 py-1 text-sm rounded-md"
+        [class.bg-sky-600]="itemsPerPage() === 50" [class.text-white]="itemsPerPage() === 50"
+        [class.bg-gray-200]="itemsPerPage() !== 50">50</button>
+      <button (click)="setItemsPerPage(100)" class="px-3 py-1 text-sm rounded-md"
+        [class.bg-sky-600]="itemsPerPage() === 100" [class.text-white]="itemsPerPage() === 100"
+        [class.bg-gray-200]="itemsPerPage() !== 100">100</button>
+      <button (click)="setItemsPerPage(Infinity)" class="px-3 py-1 text-sm rounded-md"
+        [class.bg-sky-600]="itemsPerPage() === Infinity" [class.text-white]="itemsPerPage() === Infinity"
+        [class.bg-gray-200]="itemsPerPage() !== Infinity">{{ t().articles.pagination.all }}</button>
     </div>
   </div>
 
   <div class="overflow-hidden bg-white rounded-xl shadow-md border border-gray-200">
     <div class="overflow-x-auto">
       <table class="w-full text-sm text-left text-gray-500">
-        <thead class="text-xs text-gray-500 uppercase bg-gray-50">
+        <thead class="text-xs text-white uppercase bg-slate-800">
           <tr>
-            <th scope="col" class="px-6 py-4" app-table-header [sortKey]="'id'" [activeSortKey]="sortKey()" [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().movements.table.id }}</th>
-            <th scope="col" class="px-6 py-4" app-table-header [sortKey]="'articleName'" [activeSortKey]="sortKey()" [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().movements.table.article }}</th>
-            <th scope="col" class="px-6 py-4" app-table-header [sortKey]="'date'" [activeSortKey]="sortKey()" [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().movements.table.date }}</th>
-            <th scope="col" class="px-6 py-4" app-table-header [sortKey]="'type'" [activeSortKey]="sortKey()" [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().movements.table.type }}</th>
-            <th scope="col" class="px-6 py-4 text-center" app-table-header [sortKey]="'quantity'" [activeSortKey]="sortKey()" [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().movements.table.quantity }}</th>
+            <th scope="col" class="px-6 py-4" app-table-header [sortKey]="'id'" [activeSortKey]="sortKey()"
+              [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().movements.table.id }}</th>
+            <th scope="col" class="px-6 py-4" app-table-header [sortKey]="'articleName'" [activeSortKey]="sortKey()"
+              [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().movements.table.article }}</th>
+            <th scope="col" class="px-6 py-4" app-table-header [sortKey]="'date'" [activeSortKey]="sortKey()"
+              [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().movements.table.date }}</th>
+            <th scope="col" class="px-6 py-4" app-table-header [sortKey]="'type'" [activeSortKey]="sortKey()"
+              [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{ t().movements.table.type }}</th>
+            <th scope="col" class="px-6 py-4 text-center" app-table-header [sortKey]="'quantity'"
+              [activeSortKey]="sortKey()" [sortDirection]="sortDirection()" (sort)="handleSort($event)">{{
+              t().movements.table.quantity }}</th>
             <th scope="col" class="px-6 py-4">{{ t().movements.table.supplierDest }}</th>
             <th scope="col" class="px-6 py-4">{{ t().movements.table.reference }}</th>
             @if (authService.isAdmin() || authService.isEditor()) {
-              <th scope="col" class="px-6 py-4 text-center">{{ t().movements.table.actions }}</th>
+            <th scope="col" class="px-6 py-4 text-center">{{ t().movements.table.actions }}</th>
             }
           </tr>
         </thead>
         <tbody>
           @for (movement of paginatedMovements(); track movement.id) {
-            <tr class="bg-white border-b border-gray-200 hover:bg-gray-50">
-              <td class="px-6 py-4 font-medium text-gray-900">{{ movement.id }}</td>
-              <td class="px-6 py-4 font-medium text-gray-900">
-                  <button (click)="openDetailModal(movement.articleId)" class="text-sky-600 hover:underline text-left font-semibold">
-                      {{ articleNameMap().get(movement.articleId) }}
-                  </button>
-              </td>
-              <td class="px-6 py-4">{{ movement.date | customDate }}</td>
-              <td class="px-6 py-4">
-                <span class="px-2 py-1 font-semibold leading-tight rounded-full text-xs"
-                  [class.text-green-800]="movement.type === 'Entrée'"
-                  [class.bg-green-100]="movement.type === 'Entrée'"
-                  [class.text-red-800]="movement.type === 'Sortie'"
-                  [class.bg-red-100]="movement.type === 'Sortie'"
-                  [class.text-amber-800]="movement.type === 'Ajustement'"
-                  [class.bg-amber-100]="movement.type === 'Ajustement'"
-                  [class.text-gray-800]="movement.type === 'Périmé / Rebut'"
-                  [class.bg-gray-200]="movement.type === 'Périmé / Rebut'"
-                  >
-                  {{ t().movements.types[movement.type] || movement.type }}
-                </span>
-              </td>
-              <td class="px-6 py-4 text-center">{{ movement.quantity }}</td>
-              <td class="px-6 py-4">{{ movement.supplierDest }}</td>
-              <td class="px-6 py-4">{{ movement.refDoc }}</td>
-              @if (authService.isAdmin() || authService.isEditor()) {
-                <td class="px-6 py-4">
-                  @if (authService.isAdmin() || (authService.isEditor() && movement.userId === authService.currentUser()?.id)) {
-                    <div class="flex items-center justify-center gap-4">
-                      <button (click)="openEditModal(movement)" class="text-sky-600 hover:text-sky-800"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg></button>
-                      <button (click)="onDelete(movement)" class="text-red-600 hover:text-red-800"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg></button>
-                    </div>
-                  }
-                </td>
+          <tr class="bg-white border-b border-gray-200 hover:bg-gray-50">
+            <td class="px-6 py-4 font-medium text-gray-900">{{ movement.id }}</td>
+            <td class="px-6 py-4 font-medium text-gray-900">
+              <button (click)="openDetailModal(movement.articleId)"
+                class="text-sky-600 hover:underline text-left font-semibold">
+                {{ articleNameMap().get(movement.articleId) }}
+              </button>
+            </td>
+            <td class="px-6 py-4">{{ movement.date | customDate }}</td>
+            <td class="px-6 py-4">
+              <span class="px-2 py-1 font-semibold leading-tight rounded-full text-xs"
+                [class.text-green-800]="movement.type === 'Entrée'" [class.bg-green-100]="movement.type === 'Entrée'"
+                [class.text-red-800]="movement.type === 'Sortie'" [class.bg-red-100]="movement.type === 'Sortie'"
+                [class.text-amber-800]="movement.type === 'Ajustement'"
+                [class.bg-amber-100]="movement.type === 'Ajustement'"
+                [class.text-gray-800]="movement.type === 'Périmé / Rebut'"
+                [class.bg-gray-200]="movement.type === 'Périmé / Rebut'">
+                {{ t().movements.types[movement.type] || movement.type }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-center">{{ movement.quantity }}</td>
+            <td class="px-6 py-4">{{ movement.supplierDest }}</td>
+            <td class="px-6 py-4">{{ movement.refDoc }}</td>
+            @if (authService.isAdmin() || authService.isEditor()) {
+            <td class="px-6 py-4">
+              @if (authService.isAdmin() || (authService.isEditor() && movement.userId ===
+              authService.currentUser()?.id)) {
+              <div class="flex items-center justify-center gap-4">
+                <button (click)="openEditModal(movement)" class="text-sky-600 hover:text-sky-800"><svg
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                  </svg></button>
+                <button (click)="onDelete(movement)" class="text-red-600 hover:text-red-800"><svg
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                  </svg></button>
+              </div>
               }
-            </tr>
+            </td>
+            }
+          </tr>
           } @empty {
-            <tr>
-              <td [attr.colspan]="(authService.isAdmin() || authService.isEditor()) ? 8 : 7" class="px-6 py-12 text-center text-gray-500">{{ t().movements.noMovementsFound }}</td>
-            </tr>
+          <tr>
+            <td [attr.colspan]="(authService.isAdmin() || authService.isEditor()) ? 8 : 7"
+              class="px-6 py-12 text-center text-gray-500">{{ t().movements.noMovementsFound }}</td>
+          </tr>
           }
         </tbody>
       </table>
     </div>
     @if (filteredMovements().length > 0) {
-      <app-pagination 
-        [currentPage]="currentPage()" 
-        [totalItems]="filteredMovements().length"
-        [itemsPerPage]="itemsPerPage()"
-        (pageChange)="onPageChange($event)">
-        {{ paginationShowingText() }}
-      </app-pagination>
+    <app-pagination [currentPage]="currentPage()" [totalItems]="filteredMovements().length"
+      [itemsPerPage]="itemsPerPage()" (pageChange)="onPageChange($event)">
+      {{ paginationShowingText() }}
+    </app-pagination>
     }
   </div>
 </div>
@@ -299,62 +394,78 @@
 <app-modal [isOpen]="isModalOpen()" [title]="t().movements.editMovement" (close)="closeModal()">
   <form [formGroup]="movementForm" (ngSubmit)="onModalSubmit()" class="space-y-4">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-            <label class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.article.label }}</label>
-            <app-searchable-select 
-                formControlName="articleId"
-                [options]="searchableArticles()"
-                [placeholder]="t().movements.form.article.placeholder">
-            </app-searchable-select>
-        </div>
-        <div>
-            <label for="modal-type-edit" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.type.label }}</label>
-            <select id="modal-type-edit" formControlName="type" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                @for (type of movementTypes; track type) {
-                    <option [value]="type">{{ t().movements.types[type] || type }}</option>
-                }
-            </select>
-        </div>
-        <div>
-            <label for="modal-quantity-edit" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.quantity.label }}</label>
-            <input type="number" id="modal-quantity-edit" formControlName="quantity" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-        </div>
-        <div>
-            <label for="modal-date-edit" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.date.label }}</label>
-            <input type="date" id="modal-date-edit" formControlName="date" [max]="today" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-        </div>
-        <div>
-            <label for="modal-refDoc-edit" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.refDoc.label }}</label>
-            <input type="text" id="modal-refDoc-edit" formControlName="refDoc" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-        </div>
-        <div>
-            <label for="modal-supplierDest-edit" class="block mb-2 text-sm font-medium text-gray-900">{{ movementForm.get('type')?.value === 'Entrée' ? t().movements.form.supplier.label : t().movements.form.destination.label }}</label>
-            <select id="modal-supplierDest-edit" formControlName="supplierDest" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                <option value="">{{ movementForm.get('type')?.value === 'Entrée' ? t().movements.form.supplier.placeholder : t().movements.form.destination.placeholder }}</option>
-                @for (item of supplierDestinationsList(); track item) {
-                    <option [value]="item">{{ item }}</option>
-                }
-            </select>
-        </div>
-        @if (movementForm.get('type')?.value === 'Sortie' || movementForm.get('type')?.value === 'Périmé / Rebut') {
-            <div class="md:col-span-2">
-                <label for="modal-subcategory-edit" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.subcategory.label }}</label>
-                <select id="modal-subcategory-edit" formControlName="subcategory" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                    <option value="">{{ t().movements.form.subcategory.placeholder }}</option>
-                    @for (sub of outgoingSubcategories(); track sub) {
-                        <option [value]="sub">{{ sub }}</option>
-                    }
-                </select>
-            </div>
-        }
-        <div class="md:col-span-2">
-            <label for="modal-remarks-edit" class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.remarks.label }}</label>
-            <textarea id="modal-remarks-edit" formControlName="remarks" rows="2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5"></textarea>
-        </div>
+      <div>
+        <label class="block mb-2 text-sm font-medium text-gray-900">{{ t().movements.form.article.label }}</label>
+        <app-searchable-select formControlName="articleId" [options]="searchableArticles()"
+          [placeholder]="t().movements.form.article.placeholder">
+        </app-searchable-select>
+      </div>
+      <div>
+        <label for="modal-type-edit" class="block mb-2 text-sm font-medium text-gray-900">{{
+          t().movements.form.type.label }}</label>
+        <select id="modal-type-edit" formControlName="type"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+          @for (type of movementTypes; track type) {
+          <option [value]="type">{{ t().movements.types[type] || type }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label for="modal-quantity-edit" class="block mb-2 text-sm font-medium text-gray-900">{{
+          t().movements.form.quantity.label }}</label>
+        <input type="number" id="modal-quantity-edit" formControlName="quantity"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+      </div>
+      <div>
+        <label for="modal-date-edit" class="block mb-2 text-sm font-medium text-gray-900">{{
+          t().movements.form.date.label }}</label>
+        <input type="date" id="modal-date-edit" formControlName="date" [max]="today"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+      </div>
+      <div>
+        <label for="modal-refDoc-edit" class="block mb-2 text-sm font-medium text-gray-900">{{
+          t().movements.form.refDoc.label }}</label>
+        <input type="text" id="modal-refDoc-edit" formControlName="refDoc"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+      </div>
+      <div>
+        <label for="modal-supplierDest-edit" class="block mb-2 text-sm font-medium text-gray-900">{{
+          movementForm.get('type')?.value === 'Entrée' ? t().movements.form.supplier.label :
+          t().movements.form.destination.label }}</label>
+        <select id="modal-supplierDest-edit" formControlName="supplierDest"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+          <option value="">{{ movementForm.get('type')?.value === 'Entrée' ? t().movements.form.supplier.placeholder :
+            t().movements.form.destination.placeholder }}</option>
+          @for (item of supplierDestinationsList(); track item) {
+          <option [value]="item">{{ item }}</option>
+          }
+        </select>
+      </div>
+      @if (movementForm.get('type')?.value === 'Sortie' || movementForm.get('type')?.value === 'Périmé / Rebut') {
+      <div class="md:col-span-2">
+        <label for="modal-subcategory-edit" class="block mb-2 text-sm font-medium text-gray-900">{{
+          t().movements.form.subcategory.label }}</label>
+        <select id="modal-subcategory-edit" formControlName="subcategory"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+          <option value="">{{ t().movements.form.subcategory.placeholder }}</option>
+          @for (sub of outgoingSubcategories(); track sub) {
+          <option [value]="sub">{{ sub }}</option>
+          }
+        </select>
+      </div>
+      }
+      <div class="md:col-span-2">
+        <label for="modal-remarks-edit" class="block mb-2 text-sm font-medium text-gray-900">{{
+          t().movements.form.remarks.label }}</label>
+        <textarea id="modal-remarks-edit" formControlName="remarks" rows="2"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5"></textarea>
+      </div>
     </div>
     <div class="flex justify-end gap-2 pt-4">
-      <button type="button" (click)="closeModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">{{ t().common.cancel }}</button>
-      <button type="submit" [disabled]="movementForm.invalid" class="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 disabled:bg-sky-300">
+      <button type="button" (click)="closeModal()"
+        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">{{ t().common.cancel }}</button>
+      <button type="submit" [disabled]="movementForm.invalid"
+        class="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 disabled:bg-sky-300">
         {{ t().common.saveChanges }}
       </button>
     </div>

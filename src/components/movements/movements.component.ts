@@ -69,7 +69,8 @@ export class MovementsComponent {
     startDate: [''],
     endDate: [''],
     type: [''],
-    supplierDest: [''],
+    supplier: [''],
+    destination: [''],
     articleSearch: ['']
   });
 
@@ -178,8 +179,9 @@ export class MovementsComponent {
         const startDateMatch = !filters.startDate || m.date >= filters.startDate;
         const endDateMatch = !filters.endDate || m.date <= filters.endDate;
         const typeMatch = !filters.type || m.type === filters.type;
-        const destMatch = !filters.supplierDest || m.supplierDest === filters.supplierDest;
-        return articleMatch && startDateMatch && endDateMatch && typeMatch && destMatch;
+        const supplierMatch = !filters.supplier || m.supplierDest === filters.supplier;
+        const destinationMatch = !filters.destination || m.supplierDest === filters.destination;
+        return articleMatch && startDateMatch && endDateMatch && typeMatch && (supplierMatch || destinationMatch);
       })
       .sort((a, b) => {
         let valA, valB;
