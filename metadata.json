@@ -1,0 +1,5 @@
+{
+  "name": "Inventory Management LP v2.0",
+  "description": "A modern and visually appealing inventory management application to track articles, stock movements, and generate reports. Features include comprehensive filtering, sorting, and data export capabilities for efficient stock control.",
+  "requestFramePermissions": []
+}

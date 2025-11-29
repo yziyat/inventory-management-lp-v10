@@ -1,0 +1,298 @@
+<div class="space-y-6">
+  <div class="flex justify-between items-center">
+    <h1 class="text-3xl font-bold text-slate-900">{{ t().reports.title }}</h1>
+     <button (click)="exportToExcel()" class="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-md hover:bg-slate-700 transition-colors shadow-sm">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+      </svg>
+      {{ t().common.export }}
+    </button>
+  </div>
+
+  <div class="bg-white p-6 rounded-xl shadow-md" [formGroup]="filterForm">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+      <div>
+        <label for="startDate" class="block mb-2 text-sm font-medium text-slate-900">{{ t().reports.startDate }}</label>
+        <input type="date" id="startDate" formControlName="startDate" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+      </div>
+      <div>
+        <label for="endDate" class="block mb-2 text-sm font-medium text-slate-900">{{ t().reports.endDate }}</label>
+        <input type="date" id="endDate" formControlName="endDate" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+      </div>
+       <div class="md:col-span-2">
+        <label for="articleId" class="block mb-2 text-sm font-medium text-slate-900">{{ t().reports.articleLabel }}</label>
+        <app-searchable-select
+            formControlName="articleId"
+            [options]="searchableArticlesForReport()"
+            [placeholder]="t().reports.searchPlaceholder">
+        </app-searchable-select>
+      </div>
+      <div class="flex gap-2">
+        <button (click)="resetFilters()" [title]="t().common.resetFilters" class="p-2.5 bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 transition-colors flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 11.667 0l3.181-3.183m-4.991-2.691v4.992m0 0h-4.992m4.992 0-3.181-3.183a8.25 8.25 0 0 0-11.667 0L2.985 16.644Z" /></svg>
+        </button>
+        <button (click)="generateReport()" [disabled]="filterForm.invalid" class="flex-grow px-4 py-2.5 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors shadow-sm disabled:bg-indigo-300">{{ t().reports.generate }}</button>
+      </div>
+      <div class="md:col-span-5 flex items-center pt-2">
+        <input id="showMoved" type="checkbox" formControlName="showOnlyMoved" class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500">
+        <label for="showMoved" class="ml-2 text-sm font-medium text-slate-700">{{ t().reports.showOnlyMoved }}</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto bg-white rounded-xl shadow-md">
+    @if (displayReportData(); as data) {
+      @if (data.length > 0) {
+        <table class="w-full text-sm text-left text-slate-500 whitespace-nowrap">
+          <thead class="text-xs text-white uppercase bg-slate-800 sticky top-0">
+            <tr>
+              <th scope="col" class="px-3 py-3">
+                <div class="relative flex items-center gap-1" #filterContainer>
+                  <span>{{ t().reports.table.article }}</span>
+                  <button (click)="toggleFilterDropdown('articleName')" class="p-0.5 rounded" [class.bg-indigo-500]="reportFilters().articleName.size > 0" [class.text-white]="reportFilters().articleName.size > 0" [class.text-white/60]="reportFilters().articleName.size === 0" [class.hover:text-white]="reportFilters().articleName.size === 0" [class.hover:bg-indigo-600]="reportFilters().articleName.size > 0">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M2.628 1.601C5.028 1.206 7.49 1 10 1s4.973.206 7.372.601a.75.75 0 0 1 .628.74v2.288a2.25 2.25 0 0 1-.659 1.59l-4.682 4.683a2.25 2.25 0 0 0-.659 1.59v3.037c0 .684-.31 1.33-.844 1.757l-1.937 1.55A.75.75 0 0 1 8 18.25v-5.757a2.25 2.25 0 0 0-.659-1.59L2.659 6.22A2.25 2.25 0 0 1 2 4.629V2.34a.75.75 0 0 1 .628-.74Z" clip-rule="evenodd" /></svg>
+                  </button>
+                  @if (activeFilterDropdown() === 'articleName') {
+                    <div class="absolute top-full mt-2 left-0 bg-white shadow-lg rounded-md border z-20 w-64 text-slate-700 font-normal normal-case">
+                      <div class="flex justify-between items-center p-2 border-b">
+                        <button (click)="toggleSelectAll('articleName')" class="text-xs font-semibold text-indigo-600 hover:underline">{{ isAllSelected('articleName') ? t().reports.filter.deselectAll : t().reports.filter.selectAll }}</button>
+                        <button (click)="clearFilter('articleName', $event)" class="text-xs font-semibold text-indigo-600 hover:underline">{{ t().reports.filter.clear }}</button>
+                      </div>
+                      <ul class="max-h-60 overflow-y-auto p-2 space-y-1">
+                        @for (name of uniqueValues().articleName; track name) {
+                          <li>
+                            <label class="flex items-center gap-2 p-1 rounded hover:bg-slate-100 cursor-pointer">
+                              <input type="checkbox" [checked]="reportFilters().articleName.has(name)" (change)="handleFilterChange('articleName', name, $event)" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                              <span class="truncate">{{ name }}</span>
+                            </label>
+                          </li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                </div>
+              </th>
+              <th scope="col" class="px-3 py-3">
+                 <div class="relative flex items-center gap-1" #filterContainer>
+                  <span>{{ t().reports.table.code }}</span>
+                   <button (click)="toggleFilterDropdown('articleCode')" class="p-0.5 rounded" [class.bg-indigo-500]="reportFilters().articleCode.size > 0" [class.text-white]="reportFilters().articleCode.size > 0" [class.text-white/60]="reportFilters().articleCode.size === 0" [class.hover:text-white]="reportFilters().articleCode.size === 0" [class.hover:bg-indigo-600]="reportFilters().articleCode.size > 0">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M2.628 1.601C5.028 1.206 7.49 1 10 1s4.973.206 7.372.601a.75.75 0 0 1 .628.74v2.288a2.25 2.25 0 0 1-.659 1.59l-4.682 4.683a2.25 2.25 0 0 0-.659 1.59v3.037c0 .684-.31 1.33-.844 1.757l-1.937 1.55A.75.75 0 0 1 8 18.25v-5.757a2.25 2.25 0 0 0-.659-1.59L2.659 6.22A2.25 2.25 0 0 1 2 4.629V2.34a.75.75 0 0 1 .628-.74Z" clip-rule="evenodd" /></svg>
+                  </button>
+                  @if (activeFilterDropdown() === 'articleCode') {
+                    <div class="absolute top-full mt-2 left-0 bg-white shadow-lg rounded-md border z-20 w-64 text-slate-700 font-normal normal-case">
+                       <div class="flex justify-between items-center p-2 border-b">
+                        <button (click)="toggleSelectAll('articleCode')" class="text-xs font-semibold text-indigo-600 hover:underline">{{ isAllSelected('articleCode') ? t().reports.filter.deselectAll : t().reports.filter.selectAll }}</button>
+                        <button (click)="clearFilter('articleCode', $event)" class="text-xs font-semibold text-indigo-600 hover:underline">{{ t().reports.filter.clear }}</button>
+                      </div>
+                      <ul class="max-h-60 overflow-y-auto p-2 space-y-1">
+                        @for (code of uniqueValues().articleCode; track code) {
+                          <li>
+                            <label class="flex items-center gap-2 p-1 rounded hover:bg-slate-100 cursor-pointer">
+                              <input type="checkbox" [checked]="reportFilters().articleCode.has(code)" (change)="handleFilterChange('articleCode', code, $event)" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                               <span class="truncate">{{ code }}</span>
+                            </label>
+                          </li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                </div>
+              </th>
+              <th scope="col" class="px-3 py-3 text-center">
+                 <div class="relative flex items-center justify-center gap-1" #filterContainer>
+                  <span>{{ t().reports.table.initialStock }}</span>
+                   <button (click)="toggleFilterDropdown('stockInitial')" class="p-0.5 rounded" [class.bg-indigo-500]="reportFilters().stockInitial.size > 0" [class.text-white]="reportFilters().stockInitial.size > 0" [class.text-white/60]="reportFilters().stockInitial.size === 0" [class.hover:text-white]="reportFilters().stockInitial.size === 0" [class.hover:bg-indigo-600]="reportFilters().stockInitial.size > 0">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M2.628 1.601C5.028 1.206 7.49 1 10 1s4.973.206 7.372.601a.75.75 0 0 1 .628.74v2.288a2.25 2.25 0 0 1-.659 1.59l-4.682 4.683a2.25 2.25 0 0 0-.659 1.59v3.037c0 .684-.31 1.33-.844 1.757l-1.937 1.55A.75.75 0 0 1 8 18.25v-5.757a2.25 2.25 0 0 0-.659-1.59L2.659 6.22A2.25 2.25 0 0 1 2 4.629V2.34a.75.75 0 0 1 .628-.74Z" clip-rule="evenodd" /></svg>
+                  </button>
+                  @if (activeFilterDropdown() === 'stockInitial') {
+                    <div class="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white shadow-lg rounded-md border z-20 w-48 text-slate-700 font-normal normal-case">
+                       <div class="flex justify-between items-center p-2 border-b">
+                        <button (click)="toggleSelectAll('stockInitial')" class="text-xs font-semibold text-indigo-600 hover:underline">{{ isAllSelected('stockInitial') ? t().reports.filter.deselectAll : t().reports.filter.selectAll }}</button>
+                        <button (click)="clearFilter('stockInitial', $event)" class="text-xs font-semibold text-indigo-600 hover:underline">{{ t().reports.filter.clear }}</button>
+                      </div>
+                      <ul class="max-h-60 overflow-y-auto p-2 space-y-1">
+                        @for (val of uniqueValues().stockInitial; track val) {
+                          <li>
+                            <label class="flex items-center gap-2 p-1 rounded hover:bg-slate-100 cursor-pointer">
+                              <input type="checkbox" [checked]="reportFilters().stockInitial.has(val)" (change)="handleFilterChange('stockInitial', val, $event)" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                               <span>{{ val }}</span>
+                            </label>
+                          </li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                </div>
+              </th>
+              <th scope="col" class="px-3 py-3 text-center bg-green-800">{{ t().reports.table.totalIn }}</th>
+              @for(dest of reportDestinations(); track dest) {
+                <th scope="col" class="px-3 py-3 text-center bg-red-800">{{ dest }}</th>
+              }
+              <th scope="col" class="px-3 py-3 text-center bg-red-900">{{ t().reports.table.totalOut }}</th>
+              <th scope="col" class="px-3 py-3 text-center">
+                 <div class="relative flex items-center justify-center gap-1" #filterContainer>
+                  <span>{{ t().reports.table.finalStock }}</span>
+                   <button (click)="toggleFilterDropdown('stockFinal')" class="p-0.5 rounded" [class.bg-indigo-500]="reportFilters().stockFinal.size > 0" [class.text-white]="reportFilters().stockFinal.size > 0" [class.text-white/60]="reportFilters().stockFinal.size === 0" [class.hover:text-white]="reportFilters().stockFinal.size === 0" [class.hover:bg-indigo-600]="reportFilters().stockFinal.size > 0">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M2.628 1.601C5.028 1.206 7.49 1 10 1s4.973.206 7.372.601a.75.75 0 0 1 .628.74v2.288a2.25 2.25 0 0 1-.659 1.59l-4.682 4.683a2.25 2.25 0 0 0-.659 1.59v3.037c0 .684-.31 1.33-.844 1.757l-1.937 1.55A.75.75 0 0 1 8 18.25v-5.757a2.25 2.25 0 0 0-.659-1.59L2.659 6.22A2.25 2.25 0 0 1 2 4.629V2.34a.75.75 0 0 1 .628-.74Z" clip-rule="evenodd" /></svg>
+                  </button>
+                   @if (activeFilterDropdown() === 'stockFinal') {
+                    <div class="absolute top-full mt-2 right-0 bg-white shadow-lg rounded-md border z-20 w-48 text-slate-700 font-normal normal-case">
+                       <div class="flex justify-between items-center p-2 border-b">
+                        <button (click)="toggleSelectAll('stockFinal')" class="text-xs font-semibold text-indigo-600 hover:underline">{{ isAllSelected('stockFinal') ? t().reports.filter.deselectAll : t().reports.filter.selectAll }}</button>
+                        <button (click)="clearFilter('stockFinal', $event)" class="text-xs font-semibold text-indigo-600 hover:underline">{{ t().reports.filter.clear }}</button>
+                      </div>
+                      <ul class="max-h-60 overflow-y-auto p-2 space-y-1">
+                        @for (val of uniqueValues().stockFinal; track val) {
+                          <li>
+                            <label class="flex items-center gap-2 p-1 rounded hover:bg-slate-100 cursor-pointer">
+                              <input type="checkbox" [checked]="reportFilters().stockFinal.has(val)" (change)="handleFilterChange('stockFinal', val, $event)" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                               <span>{{ val }}</span>
+                            </label>
+                          </li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            @for (row of data; track row.articleId) {
+              <tr class="hover:bg-slate-50 text-sm">
+                <td class="px-3 py-3 font-medium text-slate-900 truncate" [title]="row.articleName">{{ row.articleName }}</td>
+                <td class="px-3 py-3">{{ row.articleCode }}</td>
+                <td class="px-3 py-3 text-center">{{ row.stockInitial }}</td>
+                <td class="px-3 py-3 text-center text-green-600 bg-green-50">
+                   @if (row.totalIn > 0) {
+                    <button (click)="openMovementDetailModal(row, 'in')" class="font-semibold hover:underline">{{ row.totalIn }}</button>
+                  } @else {
+                    <span>{{ row.totalIn }}</span>
+                  }
+                </td>
+                @for(dest of reportDestinations(); track dest) {
+                   <td class="px-3 py-3 text-center text-red-600 bg-red-50">
+                     @if (row.destinations[dest] > 0) {
+                      <button (click)="openMovementDetailModal(row, 'out', dest)" class="font-semibold hover:underline">{{ row.destinations[dest] }}</button>
+                    } @else {
+                      <span>{{ row.destinations[dest] || 0 }}</span>
+                    }
+                   </td>
+                }
+                <td class="px-3 py-3 text-center font-bold text-red-700 bg-red-100">{{ row.totalOut }}</td>
+                <td class="px-3 py-3 text-center font-bold text-indigo-700">{{ row.stockFinal }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <div class="text-center py-12 text-slate-500">
+          <p>{{ t().reports.noData }}</p>
+        </div>
+      }
+    } @else {
+      <div class="text-center py-12 text-slate-500">
+        <p>{{ t().reports.generatePrompt }}</p>
+      </div>
+    }
+  </div>
+
+  <!-- Daily Movements Log -->
+  <div class="bg-white p-6 rounded-xl shadow-md mt-6">
+    <h2 class="text-xl font-semibold text-slate-800 mb-4">{{ t().reports.dailyLog.title }}</h2>
+    <form [formGroup]="dailyLogFiltersForm" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end pb-4 mb-4 border-b">
+        <div>
+            <label for="dailyLogDate" class="block mb-2 text-sm font-medium text-slate-900">{{ t().reports.dailyLog.date }}</label>
+            <input type="date" id="dailyLogDate" formControlName="date" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+        </div>
+        <div class="md:col-span-1">
+            <label for="dailyLogArticle" class="block mb-2 text-sm font-medium text-slate-900">{{ t().reports.dailyLog.article }}</label>
+            <app-searchable-select formControlName="articleId" [options]="searchableArticlesForDailyLog()" [placeholder]="t().reports.dailyLog.allArticles"></app-searchable-select>
+        </div>
+        <div>
+            <label for="dailyLogSupplier" class="block mb-2 text-sm font-medium text-slate-900">{{ t().reports.dailyLog.supplier }}</label>
+            <select id="dailyLogSupplier" formControlName="supplier" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                <option value="">{{ t().reports.dailyLog.allSuppliers }}</option>
+                @for(supplier of allSuppliers(); track supplier) {
+                    <option [value]="supplier">{{ supplier }}</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label for="dailyLogDest" class="block mb-2 text-sm font-medium text-slate-900">{{ t().reports.dailyLog.destination }}</label>
+            <select id="dailyLogDest" formControlName="destination" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                <option value="">{{ t().reports.dailyLog.allDestinations }}</option>
+                @for(dest of allDestinations(); track dest) {
+                    <option [value]="dest">{{ dest }}</option>
+                }
+            </select>
+        </div>
+        <button (click)="applyDailyLogFilters()" [disabled]="dailyLogFiltersForm.invalid" class="px-4 py-2.5 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors shadow-sm disabled:bg-indigo-300">{{ t().common.apply }}</button>
+    </form>
+    <div class="overflow-x-auto max-h-96">
+      @if (dailyLogData().length > 0) {
+        <table class="w-full text-sm text-left text-slate-500">
+            <thead class="text-xs text-slate-700 uppercase bg-slate-100 sticky top-0">
+              <tr>
+                <th scope="col" class="px-4 py-2">{{ t().reports.dailyLog.table.article }}</th>
+                <th scope="col" class="px-4 py-2">{{ t().reports.dailyLog.table.type }}</th>
+                <th scope="col" class="px-4 py-2 text-center">{{ t().reports.dailyLog.table.quantity }}</th>
+                <th scope="col" class="px-4 py-2">{{ t().reports.dailyLog.table.dest }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(item of dailyLogData(); track item.id) {
+                <tr class="border-b">
+                  <td class="px-4 py-2 font-medium text-slate-900">{{ articleMap().get(item.articleId)?.name }}</td>
+                  <td class="px-4 py-2">
+                    <span class="px-2 py-0.5 text-xs font-semibold leading-tight rounded-full"
+                        [class.text-green-800]="item.type === 'Entrée'" [class.bg-green-100]="item.type === 'Entrée'"
+                        [class.text-red-800]="item.type === 'Sortie'" [class.bg-red-100]="item.type === 'Sortie'"
+                        [class.text-amber-800]="item.type === 'Ajustement'" [class.bg-amber-100]="item.type === 'Ajustement'"
+                        [class.text-slate-800]="item.type === 'Périmé / Rebut'" [class.bg-slate-200]="item.type === 'Périmé / Rebut'">
+                        {{ t().movements.types[item.type] }}
+                    </span>
+                  </td>
+                  <td class="px-4 py-2 text-center font-medium">{{ item.quantity }}</td>
+                  <td class="px-4 py-2">{{ item.supplierDest }}</td>
+                </tr>
+              }
+            </tbody>
+        </table>
+      } @else {
+        <div class="h-48 flex items-center justify-center text-slate-500">{{ t().reports.dailyLog.noMovements }}</div>
+      }
+    </div>
+  </div>
+</div>
+
+<app-modal [isOpen]="isDetailModalOpen()" [title]="modalTitle()" (close)="closeMovementDetailModal()" modalClass="max-w-4xl">
+  @if (modalMovements().length > 0) {
+    <div class="max-h-[60vh] overflow-y-auto">
+      <table class="w-full text-sm text-left text-slate-500">
+        <thead class="text-xs text-slate-700 uppercase bg-slate-100 sticky top-0">
+          <tr>
+            <th scope="col" class="px-4 py-2">Date</th>
+            <th scope="col" class="px-4 py-2">Type</th>
+            <th scope="col" class="px-4 py-2 text-right">Quantité</th>
+            <th scope="col" class="px-4 py-2">Fourn./Dest.</th>
+            <th scope="col" class="px-4 py-2">Utilisateur</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+          @for (movement of modalMovements(); track movement.id) {
+            <tr class="bg-white">
+              <td class="px-4 py-2">{{ movement.date | customDate }}</td>
+              <td class="px-4 py-2">{{ t().movements.types[movement.type] || movement.type }}</td>
+              <td class="px-4 py-2 text-right font-medium">{{ movement.quantity }}</td>
+              <td class="px-4 py-2">{{ movement.supplierDest }}</td>
+              <td class="px-4 py-2">{{ userNameMap().get(movement.userId) || 'N/A' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p class="text-center text-slate-500 py-8">{{ t().reports.noData }}</p>
+  }
+</app-modal>

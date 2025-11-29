@@ -1,0 +1,168 @@
+<div class="space-y-6">
+  <h1 class="text-3xl font-bold text-slate-900">{{ t().dashboard.title }}</h1>
+  
+  <!-- Widget 1: Daily Movements Log -->
+  <div class="bg-white p-6 rounded-xl shadow-md">
+    <h2 class="text-xl font-semibold text-slate-800 mb-4">{{ t().dashboard.dailyLog.title }}</h2>
+    <form [formGroup]="dailyLogFiltersForm" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end pb-4 mb-4 border-b">
+        <div>
+            <label for="dailyLogDate" class="block mb-2 text-sm font-medium text-slate-900">{{ t().dashboard.dailyLog.date }}</label>
+            <input type="date" id="dailyLogDate" formControlName="date" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+        </div>
+        <div class="md:col-span-1">
+            <label for="dailyLogArticle" class="block mb-2 text-sm font-medium text-slate-900">{{ t().dashboard.dailyLog.article }}</label>
+            <app-searchable-select formControlName="articleId" [options]="searchableArticles()" [placeholder]="t().dashboard.dailyLog.allArticles"></app-searchable-select>
+        </div>
+        <div>
+            <label for="dailyLogSupplier" class="block mb-2 text-sm font-medium text-slate-900">{{ t().dashboard.dailyLog.supplier }}</label>
+            <select id="dailyLogSupplier" formControlName="supplier" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                <option value="">{{ t().dashboard.dailyLog.allSuppliers }}</option>
+                @for(supplier of allSuppliers(); track supplier) {
+                    <option [value]="supplier">{{ supplier }}</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label for="dailyLogDest" class="block mb-2 text-sm font-medium text-slate-900">{{ t().dashboard.dailyLog.destination }}</label>
+            <select id="dailyLogDest" formControlName="destination" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                <option value="">{{ t().dashboard.dailyLog.allDestinations }}</option>
+                @for(dest of allDestinations(); track dest) {
+                    <option [value]="dest">{{ dest }}</option>
+                }
+            </select>
+        </div>
+        <button (click)="applyDailyLogFilters()" [disabled]="dailyLogFiltersForm.invalid" class="px-4 py-2.5 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors shadow-sm disabled:bg-indigo-300">{{ t().common.apply }}</button>
+    </form>
+    <div class="overflow-x-auto max-h-96">
+      @if (dailyLogData().length > 0) {
+        <table class="w-full text-sm text-left text-slate-500">
+            <thead class="text-xs text-slate-700 uppercase bg-slate-100 sticky top-0">
+              <tr>
+                <th scope="col" class="px-4 py-2">{{ t().dashboard.dailyLog.table.article }}</th>
+                <th scope="col" class="px-4 py-2">{{ t().dashboard.dailyLog.table.type }}</th>
+                <th scope="col" class="px-4 py-2 text-center">{{ t().dashboard.dailyLog.table.quantity }}</th>
+                <th scope="col" class="px-4 py-2">{{ t().dashboard.dailyLog.table.dest }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(item of dailyLogData(); track item.id) {
+                <tr class="border-b">
+                  <td class="px-4 py-2 font-medium text-slate-900">{{ articleMap().get(item.articleId)?.name }}</td>
+                  <td class="px-4 py-2">
+                    <span class="px-2 py-0.5 text-xs font-semibold leading-tight rounded-full"
+                        [class.text-green-800]="item.type === 'Entrée'" [class.bg-green-100]="item.type === 'Entrée'"
+                        [class.text-red-800]="item.type === 'Sortie'" [class.bg-red-100]="item.type === 'Sortie'"
+                        [class.text-amber-800]="item.type === 'Ajustement'" [class.bg-amber-100]="item.type === 'Ajustement'"
+                        [class.text-slate-800]="item.type === 'Périmé / Rebut'" [class.bg-slate-200]="item.type === 'Périmé / Rebut'">
+                        {{ t().movements.types[item.type] }}
+                    </span>
+                  </td>
+                  <td class="px-4 py-2 text-center font-medium">{{ item.quantity }}</td>
+                  <td class="px-4 py-2">{{ item.supplierDest }}</td>
+                </tr>
+              }
+            </tbody>
+        </table>
+      } @else {
+        <div class="h-48 flex items-center justify-center text-slate-500">{{ t().dashboard.dailyLog.noMovements }}</div>
+      }
+    </div>
+  </div>
+
+  <!-- Widget 2: Top Moved Items -->
+  <div class="bg-white p-6 rounded-xl shadow-md">
+    <h2 class="text-xl font-semibold text-slate-800 mb-4">{{ t().dashboard.topMoved.title }}</h2>
+    <form [formGroup]="topItemsFiltersForm" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end pb-4 mb-4 border-b">
+        <div>
+            <label for="topItemsStartDate" class="block mb-2 text-sm font-medium text-slate-900">{{ t().dashboard.startDate }}</label>
+            <input type="date" id="topItemsStartDate" formControlName="startDate" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+        </div>
+        <div>
+            <label for="topItemsEndDate" class="block mb-2 text-sm font-medium text-slate-900">{{ t().dashboard.endDate }}</label>
+            <input type="date" id="topItemsEndDate" formControlName="endDate" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+        </div>
+        <div>
+            <label for="topItemsCategory" class="block mb-2 text-sm font-medium text-slate-900">{{ t().dashboard.topMoved.category }}</label>
+            <select id="topItemsCategory" formControlName="category" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                <option value="">{{ t().dashboard.topMoved.allCategories }}</option>
+                @for(cat of allCategories(); track cat) {
+                    <option [value]="cat">{{ cat }}</option>
+                }
+            </select>
+        </div>
+        <button (click)="applyTopItemsFilters()" [disabled]="topItemsFiltersForm.invalid" class="px-4 py-2.5 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors shadow-sm disabled:bg-indigo-300">{{ t().common.apply }}</button>
+    </form>
+    <div class="overflow-x-auto max-h-96">
+      @if (topMovedItemsData().length > 0) {
+          <table class="w-full text-sm text-left text-slate-500">
+            <thead class="text-xs text-slate-700 uppercase bg-slate-100 sticky top-0">
+              <tr>
+                <th scope="col" class="px-4 py-2 w-12">{{ t().dashboard.topMoved.table.rank }}</th>
+                <th scope="col" class="px-4 py-2">{{ t().dashboard.topMoved.table.article }}</th>
+                <th scope="col" class="px-4 py-2 text-right">{{ t().dashboard.topMoved.table.quantity }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(item of topMovedItemsData(); track item.name; let i = $index) {
+                <tr class="border-b">
+                  <td class="px-4 py-2 font-medium text-slate-700 text-center">{{ i + 1 }}</td>
+                  <td class="px-4 py-2 font-medium text-slate-900">{{ item.name }}</td>
+                  <td class="px-4 py-2 text-right font-semibold text-red-600">{{ item.quantity }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        } @else {
+          <div class="h-48 flex items-center justify-center text-slate-500">{{ t().dashboard.topMoved.noData }}</div>
+        }
+    </div>
+  </div>
+  
+  <!-- Widget 3: Movement Analysis -->
+  <div class="bg-white p-6 rounded-xl shadow-md">
+    <h2 class="text-xl font-semibold text-slate-800 mb-4">{{ t().dashboard.analysis.title }}</h2>
+    <form [formGroup]="analysisFiltersForm" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 items-end pb-4 mb-4 border-b">
+        <div class="lg:col-span-1">
+            <label for="analysisStartDate" class="block mb-2 text-sm font-medium text-slate-900">{{ t().dashboard.startDate }}</label>
+            <input type="date" id="analysisStartDate" formControlName="startDate" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+        </div>
+        <div class="lg:col-span-1">
+            <label for="analysisEndDate" class="block mb-2 text-sm font-medium text-slate-900">{{ t().dashboard.endDate }}</label>
+            <input type="date" id="analysisEndDate" formControlName="endDate" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+        </div>
+        <div class="lg:col-span-1">
+            <label for="analysisCategory" class="block mb-2 text-sm font-medium text-slate-900">{{ t().dashboard.topMoved.category }}</label>
+            <select id="analysisCategory" formControlName="category" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+                <option value="">{{ t().dashboard.topMoved.allCategories }}</option>
+                @for(cat of allCategories(); track cat) {
+                    <option [value]="cat">{{ cat }}</option>
+                }
+            </select>
+        </div>
+        <div class="lg:col-span-1">
+            <label for="analysisArticle" class="block mb-2 text-sm font-medium text-slate-900">{{ t().dashboard.dailyLog.article }}</label>
+            <app-searchable-select formControlName="articleId" [options]="searchableArticles()" [placeholder]="t().dashboard.dailyLog.allArticles"></app-searchable-select>
+        </div>
+        <button (click)="applyAnalysisFilters()" [disabled]="analysisFiltersForm.invalid" class="px-4 py-2.5 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors shadow-sm disabled:bg-indigo-300">{{ t().common.apply }}</button>
+    </form>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
+        <div>
+            <h3 class="text-lg font-semibold text-slate-700 mb-2 text-center">{{ t().dashboard.analysis.outgoing }}</h3>
+            @if (outgoingByDestData().length > 0) {
+                <div #outgoingByDestChart></div>
+            } @else {
+                <div class="h-[300px] flex items-center justify-center text-slate-500">{{ t().dashboard.noData }}</div>
+            }
+        </div>
+        <div>
+            <h3 class="text-lg font-semibold text-slate-700 mb-2 text-center">{{ t().dashboard.analysis.incoming }}</h3>
+            @if (incomingBySupData().length > 0) {
+                <div #incomingBySupChart></div>
+            } @else {
+                <div class="h-[300px] flex items-center justify-center text-slate-500">{{ t().dashboard.noData }}</div>
+            }
+        </div>
+    </div>
+  </div>
+
+</div>

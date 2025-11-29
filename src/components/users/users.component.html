@@ -1,0 +1,106 @@
+<div class="space-y-6">
+  <div class="flex justify-between items-center">
+    <h1 class="text-3xl font-bold text-slate-900">{{ t().users.title }}</h1>
+    @if (authService.isAdmin()) {
+      <button (click)="openAddModal()" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors shadow-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
+        </svg>
+        {{ t().users.addUser }}
+      </button>
+    }
+  </div>
+
+  <div class="overflow-x-auto bg-white rounded-xl shadow-md">
+    <table class="w-full text-sm text-left text-slate-500">
+      <thead class="text-xs text-white uppercase bg-slate-800">
+        <tr>
+          <th scope="col" class="px-6 py-3">{{ t().users.table.id }}</th>
+          <th scope="col" class="px-6 py-3">{{ t().users.table.username }}</th>
+          <th scope="col" class="px-6 py-3">{{ t().users.table.firstName }}</th>
+          <th scope="col" class="px-6 py-3">{{ t().users.table.lastName }}</th>
+          <th scope="col" class="px-6 py-3">{{ t().users.table.role }}</th>
+          @if (authService.isAdmin()) {
+            <th scope="col" class="px-6 py-3 text-center">{{ t().users.table.actions }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of users(); track user.id) {
+          <tr class="bg-white border-b border-slate-200 even:bg-slate-50 hover:bg-slate-100">
+            <td class="px-6 py-4 font-medium text-slate-900">{{ user.id }}</td>
+            <td class="px-6 py-4">{{ user.username }}</td>
+            <td class="px-6 py-4">{{ user.firstName }}</td>
+            <td class="px-6 py-4">{{ user.lastName }}</td>
+            <td class="px-6 py-4">
+              <span class="px-2 py-1 font-semibold leading-tight rounded-full capitalize"
+                [class.text-red-800]="user.role === 'admin'"
+                [class.bg-red-100]="user.role === 'admin'"
+                [class.text-indigo-800]="user.role === 'editor'"
+                [class.bg-indigo-100]="user.role === 'editor'"
+                [class.text-slate-800]="user.role === 'viewer'"
+                [class.bg-slate-200]="user.role === 'viewer'">
+                {{ t().users.roles[user.role] }}
+              </span>
+            </td>
+            @if (authService.isAdmin()) {
+              <td class="px-6 py-4 text-center">
+                <div class="flex items-center justify-center gap-4">
+                  <button (click)="openEditModal(user)" class="flex items-center gap-1 font-medium text-indigo-600 hover:text-indigo-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg>
+                    {{ t().common.edit }}
+                  </button>
+                  <button (click)="onDelete(user)" class="flex items-center gap-1 font-medium text-red-600 hover:text-red-800" [disabled]="user.id === authService.currentUser()?.id" [class.opacity-50]="user.id === authService.currentUser()?.id" [class.cursor-not-allowed]="user.id === authService.currentUser()?.id">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
+                    {{ t().common.delete }}
+                  </button>
+                </div>
+              </td>
+            }
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4" class="px-6 py-12 text-center text-slate-500">{{ t().users.noUsersFound }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<app-modal [isOpen]="isModalOpen()" [title]="editingUser() ? t().users.editUser : t().users.addUser" (close)="closeModal()">
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label for="firstName" class="block mb-2 text-sm font-medium text-slate-900">{{ t().users.form.firstName.label }}</label>
+        <input type="text" id="firstName" formControlName="firstName" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+      </div>
+      <div>
+        <label for="lastName" class="block mb-2 text-sm font-medium text-slate-900">{{ t().users.form.lastName.label }}</label>
+        <input type="text" id="lastName" formControlName="lastName" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+      </div>
+    </div>
+    <div>
+      <label for="username" class="block mb-2 text-sm font-medium text-slate-900">{{ t().users.form.username.label }}</label>
+      <input type="text" id="username" formControlName="username" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+    </div>
+    <div>
+      <label for="role" class="block mb-2 text-sm font-medium text-slate-900">{{ t().users.form.role.label }}</label>
+      <select id="role" formControlName="role" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+        @for (role of userRoles; track role) {
+          <option [value]="role" class="capitalize">{{ t().users.roles[role] }}</option>
+        }
+      </select>
+    </div>
+    <div>
+      <label for="password" class="block mb-2 text-sm font-medium text-slate-900">{{ editingUser() ? t().users.form.password.labelOptional : t().users.form.password.label }}</label>
+      <input type="password" id="password" formControlName="password" [placeholder]="editingUser() ? t().users.form.password.placeholder : ''" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+    </div>
+    <div class="flex justify-end gap-2 pt-4">
+      <button type="button" (click)="closeModal()" class="px-4 py-2 bg-slate-200 text-slate-800 rounded-md hover:bg-slate-300">{{ t().common.cancel }}</button>
+      <button type="submit" [disabled]="userForm.invalid" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">
+        {{ editingUser() ? t().common.saveChanges : t().users.createUser }}
+      </button>
+    </div>
+  </form>
+</app-modal>
