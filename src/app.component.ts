@@ -22,6 +22,7 @@ export class AppComponent {
 
   isMobileMenuOpen = signal(false);
   pageTitle = signal('');
+  currentRoute = signal('');
 
   private allNavItems = [
     { path: '/stock', label: 'Stock', icon: 'archive-box', adminOnly: false },
@@ -63,6 +64,13 @@ export class AppComponent {
         const translatedTitle = navTranslations[key] || title;
         this.pageTitle.set(translatedTitle);
       }
+    });
+
+    // Track current route
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      this.currentRoute.set(event.urlAfterRedirects);
     });
   }
 

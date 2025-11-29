@@ -269,7 +269,7 @@
   <!-- Daily Movements Log -->
   <div class="bg-white p-6 rounded-xl shadow-md mt-6">
     <h2 class="text-xl font-semibold text-slate-800 mb-4">{{ t().reports.dailyLog.title }}</h2>
-    <form [formGroup]="dailyLogFiltersForm" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end pb-4 mb-4 border-b">
+    <form [formGroup]="dailyLogFiltersForm" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end pb-4 mb-4 border-b">
       <div>
         <label for="dailyLogDate" class="block mb-2 text-sm font-medium text-slate-900">{{ t().reports.dailyLog.date
           }}</label>
@@ -304,9 +304,31 @@
           }
         </select>
       </div>
-      <button (click)="applyDailyLogFilters()" [disabled]="dailyLogFiltersForm.invalid"
-        class="px-4 py-2.5 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors shadow-sm disabled:bg-indigo-300">{{
-        t().common.apply }}</button>
+      <div>
+        <label for="dailyLogType" class="block mb-2 text-sm font-medium text-slate-900">{{ t().movements.form.type.label
+          }}</label>
+        <select id="dailyLogType" formControlName="type"
+          class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+          <option value="">{{ t().movements.filters.allTypes }}</option>
+          <option value="Entrée">{{ t().movements.types['Entrée'] }}</option>
+          <option value="Sortie">{{ t().movements.types['Sortie'] }}</option>
+          <option value="Ajustement">{{ t().movements.types['Ajustement'] }}</option>
+          <option value="Périmé / Rebut">{{ t().movements.types['Périmé / Rebut'] }}</option>
+        </select>
+      </div>
+      <div class="flex gap-2">
+        <button type="button" (click)="applyDailyLogFilters()" [disabled]="dailyLogFiltersForm.invalid"
+          class="px-4 py-2.5 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors shadow-sm disabled:bg-indigo-300">{{
+          t().common.apply }}</button>
+        <button type="button" (click)="resetDailyLogFilters()" [title]="t().common.resetFilters"
+          class="px-3 py-2.5 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 11.667 0l3.181-3.183m-4.991-2.691v4.992m0 0h-4.992m4.992 0-3.181-3.183a8.25 8.25 0 0 0-11.667 0L2.985 16.644Z" />
+          </svg>
+        </button>
+      </div>
     </form>
     <div class="overflow-x-auto max-h-96">
       @if (dailyLogData().length > 0) {

@@ -62,10 +62,13 @@ export class ReportsComponent implements OnInit, OnDestroy {
     showOnlyMoved: [true]
   });
 
+  today = new Date().toISOString().split('T')[0];
+
   // Daily Log properties
   dailyLogFiltersForm = this.fb.group({
-    date: [new Date().toISOString().split('T')[0]],
+    date: [this.today, Validators.required],
     articleId: [''],
+    type: [''],
     supplier: [''],
     destination: [''],
   });
@@ -161,6 +164,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       .filter(m => {
         const dateMatch = m.date === filters.date;
         const articleMatch = !filters.articleId || m.articleId === filters.articleId;
+        const typeMatch = !filters.type || m.type === filters.type;
 
         const supplier = filters.supplier;
         const destination = filters.destination;
@@ -177,12 +181,23 @@ export class ReportsComponent implements OnInit, OnDestroy {
         }
 
 
-        return dateMatch && articleMatch && supplierDestMatch;
+        return dateMatch && articleMatch && typeMatch && supplierDestMatch;
       })
       .sort((a, b) => b.id.localeCompare(a.id));
   });
 
   applyDailyLogFilters() { this.appliedDailyLogFilters.set(this.dailyLogFiltersForm.value); }
+
+  resetDailyLogFilters() {
+    this.dailyLogFiltersForm.reset({
+      date: this.today,
+      articleId: '',
+      type: '',
+      supplier: '',
+      destination: ''
+    });
+    this.applyDailyLogFilters();
+  }
 
   uniqueValues = computed(() => {
     const data = this.rawReportData();

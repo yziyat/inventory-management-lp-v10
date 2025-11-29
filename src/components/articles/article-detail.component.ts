@@ -16,8 +16,14 @@ import { PaginationComponent } from '../shared/pagination.component';
   standalone: true,
   imports: [ModalComponent, CustomDatePipe, ReactiveFormsModule, PaginationComponent],
   template: `
-    <app-modal [isOpen]="!!article()" [title]="t().articles.detail.title" (close)="close.emit()" modalClass="max-w-6xl">
+    <app-modal [isOpen]="!!article()" [title]="article() ? t().articles.detail.title + ' - ' + article()!.name : t().articles.detail.title" (close)="close.emit()" modalClass="max-w-6xl">
       @if (article(); as art) {
+        <div class="mb-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
+          <div class="flex justify-between items-center">
+            <span class="text-sm font-medium text-indigo-900">{{ t().stock.table.currentStock }}:</span>
+            <span class="text-lg font-bold text-indigo-700">{{ currentStock() }} {{ art.unit }}</span>
+          </div>
+        </div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all" [class.blur-sm]="isMovementModalOpen()">
           <!-- Left Column: Info & Price History -->
           <div class="lg:col-span-1 space-y-6">
@@ -199,6 +205,12 @@ export class ArticleDetailComponent {
   suppliers = computed(() => this.apiService.settings().suppliers);
   destinations = computed(() => this.apiService.settings().destinations);
   outgoingSubcategories = computed(() => this.apiService.settings().outgoingSubcategories);
+  currentStock = computed(() => {
+    const art = this.article();
+    if (!art) return 0;
+    const stockItem = this.apiService.stock().find(s => s.id === art.id);
+    return stockItem?.stock || 0;
+  });
   today = new Date().toISOString().split('T')[0];
 
   // Pagination for movements
@@ -321,7 +333,7 @@ export class ArticleDetailComponent {
     try {
       const formValue = this.movementForm.getRawValue();
       const newMovement: Omit<Movement, 'id'> = {
-        articleId: this.article()!.id,
+        articleId: formValue.articleId!,
         userId: this.authService.currentUser()!.id,
         date: formValue.date!,
         refDoc: formValue.refDoc!,

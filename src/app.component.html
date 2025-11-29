@@ -1,4 +1,4 @@
-@if (authService.isLoggedIn()) {
+@if (authService.isLoggedIn() && currentRoute() !== '/login') {
 <div class="lg:flex h-screen bg-gray-50">
   <!-- Sidebar -->
   <aside
