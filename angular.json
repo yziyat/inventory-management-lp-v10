@@ -20,6 +20,9 @@
             "styles": [
               "src/styles.css"
             ],
+            "polyfills": [
+              "zone.js"
+            ],
             "allowedCommonJsDependencies": [
               "xlsx",
               "d3"
