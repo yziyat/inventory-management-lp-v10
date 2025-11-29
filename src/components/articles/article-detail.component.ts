@@ -21,7 +21,7 @@ import { PaginationComponent } from '../shared/pagination.component';
         <div class="mb-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
           <div class="flex justify-between items-center">
             <span class="text-sm font-medium text-indigo-900">{{ t().stock.table.currentStock }}:</span>
-            <span class="text-lg font-bold text-indigo-700">{{ currentStock() }} {{ art.unit }}</span>
+            <span class="text-sm font-bold text-indigo-700">{{ currentStock() }} {{ art.unit }}</span>
           </div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all" [class.blur-sm]="isMovementModalOpen()">
@@ -340,7 +340,7 @@ export class ArticleDetailComponent {
         type: formValue.type!,
         quantity: formValue.quantity!,
         supplierDest: formValue.supplierDest!,
-        subcategory: formValue.subcategory || undefined,
+        subcategory: formValue.subcategory || '',
         remarks: formValue.remarks!
       };
       await this.apiService.addMovement(newMovement);

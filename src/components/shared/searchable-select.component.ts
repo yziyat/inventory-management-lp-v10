@@ -9,13 +9,13 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   template: `
     <div class="relative" #self>
       <input 
-        #input
+        #inputElement
         type="text" 
         [placeholder]="placeholder()"
         class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5"
-        [value]="searchTerm()"
         (input)="onSearch($event)"
-        (focus)="isDropdownOpen.set(true)"
+        (focus)="onFocus()"
+        autocomplete="off"
       >
       @if (isDropdownOpen()) {
         <div class="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg max-h-60 overflow-auto border">
@@ -45,6 +45,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 })
 export class SearchableSelectComponent implements ControlValueAccessor, OnInit, OnDestroy {
   private elementRef = viewChild.required<ElementRef>('self');
+  private inputElement = viewChild.required<ElementRef<HTMLInputElement>>('inputElement');
   private renderer = inject(Renderer2);
   private documentClickListener!: () => void;
 
@@ -74,17 +75,16 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
 
 
   constructor() {
-    // When options change, re-evaluate the search term display value
+    // When options change, update the input field value if there's a selection
     effect(() => {
       const currentOptions = this.options();
-      // Use untracked to avoid creating a signal dependency cycle
       const value = this.selectedValue;
       const selectedOption = currentOptions.find(opt => opt[this.optionValueField()] === value);
 
-      if (selectedOption) {
+      if (selectedOption && this.inputElement()) {
+        const inputEl = this.inputElement().nativeElement;
+        inputEl.value = selectedOption[this.optionTextField()];
         this.searchTerm.set(selectedOption[this.optionTextField()]);
-      } else if (this.searchTerm() !== '') {
-        this.searchTerm.set('');
       }
     }, { allowSignalWrites: true });
   }
@@ -102,17 +102,24 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
   }
 
   clickout(event: Event) {
-    if (!this.elementRef().nativeElement.contains(event.target)) {
+    const target = event.target as HTMLElement;
+    const selfElement = this.elementRef().nativeElement;
+
+    // Only close if the click is truly outside the component
+    if (!selfElement.contains(target)) {
       this.isDropdownOpen.set(false);
     }
+  }
+
+  onFocus() {
+    this.isDropdownOpen.set(true);
   }
 
   onSearch(event: Event) {
     const value = (event.target as HTMLInputElement).value;
     this.searchTerm.set(value);
-    this.isDropdownOpen.set(true);
 
-    // When user types, we should clear the selection as it no longer matches
+    // Clear selection only if the typed value doesn't match the selected option
     if (this.selectedValue !== null) {
       const selectedOption = this.options()?.find(opt => opt[this.optionValueField()] === this.selectedValue);
       if (!selectedOption || selectedOption[this.optionTextField()] !== value) {
@@ -125,7 +132,14 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
   selectOption(option: any) {
     this.isDropdownOpen.set(false);
     this.selectedValue = option[this.optionValueField()];
-    this.searchTerm.set(option[this.optionTextField()]);
+    const displayText = option[this.optionTextField()];
+    this.searchTerm.set(displayText);
+
+    // Update input field directly
+    if (this.inputElement()) {
+      this.inputElement().nativeElement.value = displayText;
+    }
+
     this.onChange(this.selectedValue);
     this.onTouched();
   }
@@ -136,9 +150,18 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
     const selectedOption = currentOptions.find(opt => opt[this.optionValueField()] === value);
 
     if (selectedOption) {
-      this.searchTerm.set(selectedOption[this.optionTextField()]);
+      const displayText = selectedOption[this.optionTextField()];
+      this.searchTerm.set(displayText);
+
+      // Update input field directly
+      if (this.inputElement()) {
+        this.inputElement().nativeElement.value = displayText;
+      }
     } else {
       this.searchTerm.set('');
+      if (this.inputElement()) {
+        this.inputElement().nativeElement.value = '';
+      }
     }
   }
 
