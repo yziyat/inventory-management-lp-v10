@@ -129,7 +129,8 @@ export const en = {
       endDate: 'End Date',
       articleSearch: 'Search by article...',
       allTypes: 'All Types',
-      allDestinations: 'All Suppliers/Destinations',
+      allSuppliers: 'All Suppliers',
+      allDestinations: 'All Destinations',
     },
     table: {
       id: 'ID',

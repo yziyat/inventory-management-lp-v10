@@ -188,7 +188,7 @@ export class ArticlesComponent {
     }
   }
 
-  onFilterTermChange(event: Event) {
+  onSearchTermChange(event: Event) {
     this.searchTerm.set((event.target as HTMLInputElement).value);
     this.currentPage.set(1);
   }

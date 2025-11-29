@@ -129,7 +129,8 @@ export const fr = {
       endDate: 'Date de fin',
       articleSearch: 'Rechercher par article...',
       allTypes: 'Tous les types',
-      allDestinations: 'Tous Fournisseurs/Destinations',
+      allSuppliers: 'Tous les fournisseurs',
+      allDestinations: 'Toutes les destinations',
     },
     table: {
       id: 'ID',

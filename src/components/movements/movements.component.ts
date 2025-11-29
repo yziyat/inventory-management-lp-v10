@@ -538,7 +538,7 @@ export class MovementsComponent {
   }
 
   resetFilters() {
-    this.filterForm.reset({ startDate: '', endDate: '', type: '', supplierDest: '', articleSearch: '' });
+    this.filterForm.reset({ startDate: '', endDate: '', type: '', supplier: '', destination: '', articleSearch: '' });
     this.applyFilters();
   }
 
