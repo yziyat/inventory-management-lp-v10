@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators, FormArray, FormGroup } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { Article } from '../../models/article.model';
@@ -141,15 +141,7 @@ export class ArticlesComponent {
     description: [''],
   });
 
-  constructor() {
-    effect(() => {
-      const article = this.editingArticle();
-      if (article) {
-        this.articleForm.patchValue(article);
-        this.isModalOpen.set(true);
-      }
-    });
-  }
+
 
   setItemsPerPage(count: number) {
     this.itemsPerPage.set(count);
@@ -169,6 +161,8 @@ export class ArticlesComponent {
 
   openEditModal(article: Article) {
     this.editingArticle.set(article);
+    this.articleForm.patchValue(article);
+    this.isModalOpen.set(true);
   }
 
   closeModal() {

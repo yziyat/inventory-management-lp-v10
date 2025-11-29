@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { Movement, MovementType } from '../../models/movement.model';
@@ -264,17 +264,6 @@ export class MovementsComponent {
       this.bulkFormArticleId.set(id ? Number(id) : null);
     });
 
-    effect(() => {
-      const movement = this.editingMovement();
-      if (movement) {
-        this.movementForm.patchValue(movement);
-        this.singleMovementType.set(movement.type);
-        this.singleFormArticleId.set(movement.articleId);
-        this.updateFormValidators(movement.type);
-        this.isModalOpen.set(true);
-      }
-    });
-
     this.addBulkMovementRow();
   }
 
@@ -320,6 +309,11 @@ export class MovementsComponent {
 
   openEditModal(movement: Movement) {
     this.editingMovement.set(movement);
+    this.movementForm.patchValue(movement);
+    this.singleMovementType.set(movement.type);
+    this.singleFormArticleId.set(movement.articleId);
+    this.updateFormValidators(movement.type);
+    this.isModalOpen.set(true);
   }
 
   closeModal() {
