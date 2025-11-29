@@ -30,7 +30,7 @@ jobs:
         run: npm install
 
       - name: Build Angular App
-        run: npx ng build --configuration production --base-href /Inventory-Management-LP-v2.0/
+        run: npx ng build --configuration production --base-href /inventory-management-lp-v10/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
