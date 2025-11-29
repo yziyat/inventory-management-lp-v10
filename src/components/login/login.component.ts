@@ -22,7 +22,7 @@ export class LoginComponent {
   registrationSuccess = signal(false);
 
   loginForm = this.fb.group({
-    username: ['', [Validators.required, Validators.email]],
+    username: ['', Validators.required],
     password: ['', Validators.required],
     rememberMe: [false]
   });
