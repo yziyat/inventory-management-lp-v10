@@ -49,4 +49,32 @@ export class LoginComponent {
       }
     }
   }
+
+  async registerAdmin(): Promise<void> {
+    if (this.loginForm.valid) {
+      this.isLoading.set(true);
+      this.loginError.set(null);
+
+      const { username, password } = this.loginForm.value;
+
+      try {
+        // Create admin user data
+        const newAdmin = {
+          username: username!,
+          firstName: 'Admin',
+          lastName: 'User',
+          role: 'admin' as const,
+        };
+
+        await this.authService.signUp(username!, password!, newAdmin); // username is treated as email here
+        this.router.navigate(['/stock']);
+      } catch (error: any) {
+        this.loginError.set(error.message || 'Registration failed');
+      } finally {
+        this.isLoading.set(false);
+      }
+    } else {
+      this.loginError.set('Please fill in username (email) and password');
+    }
+  }
 }
