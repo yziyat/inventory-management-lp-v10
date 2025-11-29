@@ -18,6 +18,7 @@ import { SearchableSelectComponent } from '../shared/searchable-select.component
   standalone: true,
 })
 export class StockComponent {
+  protected readonly Infinity = Infinity;
   private apiService = inject(ApiService);
   private translationService = inject(TranslationService);
   private exportService = inject(ExportService);

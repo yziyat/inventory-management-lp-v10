@@ -10,27 +10,78 @@
         <h3 class="text-lg font-medium text-slate-700 mb-2">{{ t().settings.language.title }}</h3>
         <p class="text-sm text-slate-600 mb-3">{{ t().settings.language.description }}</p>
         <div class="flex gap-2">
-          <button (click)="setLanguage('en')" class="flex items-center gap-2 px-4 py-2 rounded-md font-semibold transition-colors text-sm" [class.bg-indigo-600]="currentLang() === 'en'" [class.text-white]="currentLang() === 'en'" [class.bg-slate-200]="currentLang() !== 'en'" [class.text-slate-800]="currentLang() !== 'en'" [class.hover:bg-indigo-700]="currentLang() === 'en'" [class.hover:bg-slate-300]="currentLang() !== 'en'">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 540 288"><path fill="#b22234" d="M0 0h540v288H0z"/><path fill="#fff" d="M0 24h540v24H0zm0 48h540v24H0zm0 48h540v24H0zm0 48h540v24H0zm0 48h540v24H0zm0 48h540v24H0z"/><path fill="#3c3b6e" d="M0 0h252v144H0z"/><path id="a" fill="#fff" d="M21 12l5 15-13-9h16l-13 9z"/><use href="#a" x="42"/><use href="#a" x="84"/><use href="#a" x="126"/><use href="#a" x="168"/><use href="#a" x="210"/><use href="#a" y="24"/><use href="#a" x="42" y="24"/><use href="#a" x="84" y="24"/><use href="#a" x="126" y="24"/><use href="#a" x="168" y="24"/><use href="#a" y="48"/><use href="#a" x="42" y="48"/><use href="#a" x="84" y="48"/><use href="#a" x="126" y="48"/><use href="#a" x="168" y="48"/><use href="#a" x="210" y="48"/><use href="#a" y="72"/><use href="#a" x="42" y="72"/><use href="#a" x="84" y="72"/><use href="#a" x="126" y="72"/><use href="#a" x="168" y="72"/><use href="#a" y="96"/><use href="#a" x="42" y="96"/><use href="#a" x="84" y="96"/><use href="#a" x="126" y="96"/><use href="#a" x="168" y="96"/><use href="#a" x="210" y="96"/><use href="#a" y="120"/><use href="#a" x="42" y="120"/><use href="#a" x="84" y="120"/><use href="#a" x="126" y="120"/><use href="#a" x="168" y="120"/></svg>
+          <button (click)="setLanguage('en')"
+            class="flex items-center gap-2 px-4 py-2 rounded-md font-semibold transition-colors text-sm"
+            [class.bg-indigo-600]="currentLang() === 'en'" [class.text-white]="currentLang() === 'en'"
+            [class.bg-slate-200]="currentLang() !== 'en'" [class.text-slate-800]="currentLang() !== 'en'"
+            [class.hover:bg-indigo-700]="currentLang() === 'en'" [class.hover:bg-slate-300]="currentLang() !== 'en'">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 540 288">
+              <path fill="#b22234" d="M0 0h540v288H0z" />
+              <path fill="#fff"
+                d="M0 24h540v24H0zm0 48h540v24H0zm0 48h540v24H0zm0 48h540v24H0zm0 48h540v24H0zm0 48h540v24H0z" />
+              <path fill="#3c3b6e" d="M0 0h252v144H0z" />
+              <path id="a" fill="#fff" d="M21 12l5 15-13-9h16l-13 9z" />
+              <use href="#a" x="42" />
+              <use href="#a" x="84" />
+              <use href="#a" x="126" />
+              <use href="#a" x="168" />
+              <use href="#a" x="210" />
+              <use href="#a" y="24" />
+              <use href="#a" x="42" y="24" />
+              <use href="#a" x="84" y="24" />
+              <use href="#a" x="126" y="24" />
+              <use href="#a" x="168" y="24" />
+              <use href="#a" y="48" />
+              <use href="#a" x="42" y="48" />
+              <use href="#a" x="84" y="48" />
+              <use href="#a" x="126" y="48" />
+              <use href="#a" x="168" y="48" />
+              <use href="#a" x="210" y="48" />
+              <use href="#a" y="72" />
+              <use href="#a" x="42" y="72" />
+              <use href="#a" x="84" y="72" />
+              <use href="#a" x="126" y="72" />
+              <use href="#a" x="168" y="72" />
+              <use href="#a" y="96" />
+              <use href="#a" x="42" y="96" />
+              <use href="#a" x="84" y="96" />
+              <use href="#a" x="126" y="96" />
+              <use href="#a" x="168" y="96" />
+              <use href="#a" x="210" y="96" />
+              <use href="#a" y="120" />
+              <use href="#a" x="42" y="120" />
+              <use href="#a" x="84" y="120" />
+              <use href="#a" x="126" y="120" />
+              <use href="#a" x="168" y="120" />
+            </svg>
             English
           </button>
-          <button (click)="setLanguage('fr')" class="flex items-center gap-2 px-4 py-2 rounded-md font-semibold transition-colors text-sm" [class.bg-indigo-600]="currentLang() === 'fr'" [class.text-white]="currentLang() === 'fr'" [class.bg-slate-200]="currentLang() !== 'fr'" [class.text-slate-800]="currentLang() !== 'fr'" [class.hover:bg-indigo-700]="currentLang() === 'fr'" [class.hover:bg-slate-300]="currentLang() !== 'fr'">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 512 512"><path fill="#002654" d="M0 0h170.7v512H0z"/><path fill="#fff" d="M170.7 0h170.6v512H170.7z"/><path fill="#ce1126" d="M341.3 0H512v512H341.3z"/></svg>
+          <button (click)="setLanguage('fr')"
+            class="flex items-center gap-2 px-4 py-2 rounded-md font-semibold transition-colors text-sm"
+            [class.bg-indigo-600]="currentLang() === 'fr'" [class.text-white]="currentLang() === 'fr'"
+            [class.bg-slate-200]="currentLang() !== 'fr'" [class.text-slate-800]="currentLang() !== 'fr'"
+            [class.hover:bg-indigo-700]="currentLang() === 'fr'" [class.hover:bg-slate-300]="currentLang() !== 'fr'">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 512 512">
+              <path fill="#002654" d="M0 0h170.7v512H0z" />
+              <path fill="#fff" d="M170.7 0h170.6v512H170.7z" />
+              <path fill="#ce1126" d="M341.3 0H512v512H341.3z" />
+            </svg>
             Français
           </button>
         </div>
       </div>
-      
+
       <!-- Date Format Settings -->
       <div>
         <h3 class="text-lg font-medium text-slate-700 mb-2">{{ t().settings.dateFormat.title }}</h3>
         <p class="text-sm text-slate-600 mb-3">{{ t().settings.dateFormat.description }}</p>
         <div class="flex gap-4">
           @for (format of dateFormats; track format) {
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="dateFormat" [value]="format" [checked]="currentDateFormat() === format" (change)="setDateFormat(format)" class="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
-              <span class="text-sm font-medium text-slate-800">{{ format }}</span>
-            </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="dateFormat" [value]="format" [checked]="currentDateFormat() === format"
+              (change)="setDateFormat(format)" class="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+            <span class="text-sm font-medium text-slate-800">{{ format }}</span>
+          </label>
           }
         </div>
       </div>
@@ -42,19 +93,28 @@
     <div class="bg-white p-6 rounded-xl shadow-md">
       <h2 class="text-xl font-semibold text-slate-800 mb-4">{{ t().settings.categories.title }}</h2>
       <div class="flex gap-2 mb-4">
-        <input type="text" [placeholder]="t().settings.categories.placeholder" class="flex-grow px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" [value]="newCategory()" (input)="newCategory.set($event.target.value)" (keyup.enter)="addSetting('categories')">
-        <button (click)="addSetting('categories')" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow-sm">{{ t().common.add }}</button>
+        <input type="text" [placeholder]="t().settings.categories.placeholder"
+          class="flex-grow px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          [value]="newCategory()" (input)="newCategory.set($any($event.target).value)"
+          (keyup.enter)="addSetting('categories')">
+        <button (click)="addSetting('categories')"
+          class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow-sm">{{ t().common.add
+          }}</button>
       </div>
       <ul class="space-y-2 max-h-48 overflow-y-auto pr-2 border rounded-md p-2">
         @for (category of categories(); track category) {
-          <li class="flex justify-between items-center p-2 rounded-md hover:bg-slate-100">
-            <span class="text-slate-700 text-sm">{{ category }}</span>
-            <button (click)="deleteSetting('categories', category)" class="text-red-500 hover:text-red-700">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
-            </button>
-          </li>
+        <li class="flex justify-between items-center p-2 rounded-md hover:bg-slate-100">
+          <span class="text-slate-700 text-sm">{{ category }}</span>
+          <button (click)="deleteSetting('categories', category)" class="text-red-500 hover:text-red-700">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+            </svg>
+          </button>
+        </li>
         } @empty {
-          <li class="text-center py-4 text-slate-500 text-sm">{{ t().settings.categories.none }}</li>
+        <li class="text-center py-4 text-slate-500 text-sm">{{ t().settings.categories.none }}</li>
         }
       </ul>
     </div>
@@ -62,20 +122,29 @@
     <!-- Suppliers Card -->
     <div class="bg-white p-6 rounded-xl shadow-md">
       <h2 class="text-xl font-semibold text-slate-800 mb-4">{{ t().settings.suppliers.title }}</h2>
-       <div class="flex gap-2 mb-4">
-        <input type="text" [placeholder]="t().settings.suppliers.placeholder" class="flex-grow px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" [value]="newSupplier()" (input)="newSupplier.set($event.target.value)" (keyup.enter)="addSetting('suppliers')">
-        <button (click)="addSetting('suppliers')" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow-sm">{{ t().common.add }}</button>
+      <div class="flex gap-2 mb-4">
+        <input type="text" [placeholder]="t().settings.suppliers.placeholder"
+          class="flex-grow px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          [value]="newSupplier()" (input)="newSupplier.set($any($event.target).value)"
+          (keyup.enter)="addSetting('suppliers')">
+        <button (click)="addSetting('suppliers')"
+          class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow-sm">{{ t().common.add
+          }}</button>
       </div>
       <ul class="space-y-2 max-h-48 overflow-y-auto pr-2 border rounded-md p-2">
         @for (supplier of suppliers(); track supplier) {
-           <li class="flex justify-between items-center p-2 rounded-md hover:bg-slate-100">
-            <span class="text-slate-700 text-sm">{{ supplier }}</span>
-            <button (click)="deleteSetting('suppliers', supplier)" class="text-red-500 hover:text-red-700">
-               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
-            </button>
-          </li>
+        <li class="flex justify-between items-center p-2 rounded-md hover:bg-slate-100">
+          <span class="text-slate-700 text-sm">{{ supplier }}</span>
+          <button (click)="deleteSetting('suppliers', supplier)" class="text-red-500 hover:text-red-700">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+            </svg>
+          </button>
+        </li>
         } @empty {
-          <li class="text-center py-4 text-slate-500 text-sm">{{ t().settings.suppliers.none }}</li>
+        <li class="text-center py-4 text-slate-500 text-sm">{{ t().settings.suppliers.none }}</li>
         }
       </ul>
     </div>
@@ -86,40 +155,58 @@
     <div class="bg-white p-6 rounded-xl shadow-md">
       <h2 class="text-xl font-semibold text-slate-800 mb-4">{{ t().settings.destinations.title }}</h2>
       <div class="flex gap-2 mb-4">
-        <input type="text" [placeholder]="t().settings.destinations.placeholder" class="flex-grow px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" [value]="newDestination()" (input)="newDestination.set($event.target.value)" (keyup.enter)="addSetting('destinations')">
-        <button (click)="addSetting('destinations')" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow-sm">{{ t().common.add }}</button>
+        <input type="text" [placeholder]="t().settings.destinations.placeholder"
+          class="flex-grow px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          [value]="newDestination()" (input)="newDestination.set($any($event.target).value)"
+          (keyup.enter)="addSetting('destinations')">
+        <button (click)="addSetting('destinations')"
+          class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow-sm">{{ t().common.add
+          }}</button>
       </div>
       <ul class="space-y-2 max-h-48 overflow-y-auto pr-2 border rounded-md p-2">
         @for (dest of destinations(); track dest) {
-          <li class="flex justify-between items-center p-2 rounded-md hover:bg-slate-100">
-            <span class="text-slate-700 text-sm">{{ dest }}</span>
-            <button (click)="deleteSetting('destinations', dest)" class="text-red-500 hover:text-red-700">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
-            </button>
-          </li>
+        <li class="flex justify-between items-center p-2 rounded-md hover:bg-slate-100">
+          <span class="text-slate-700 text-sm">{{ dest }}</span>
+          <button (click)="deleteSetting('destinations', dest)" class="text-red-500 hover:text-red-700">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+            </svg>
+          </button>
+        </li>
         } @empty {
-          <li class="text-center py-4 text-slate-500 text-sm">{{ t().settings.destinations.none }}</li>
+        <li class="text-center py-4 text-slate-500 text-sm">{{ t().settings.destinations.none }}</li>
         }
       </ul>
     </div>
-    
+
     <!-- Outgoing Subcategories Card -->
     <div class="bg-white p-6 rounded-xl shadow-md">
       <h2 class="text-xl font-semibold text-slate-800 mb-4">{{ t().settings.outgoingSubcategories.title }}</h2>
-       <div class="flex gap-2 mb-4">
-        <input type="text" [placeholder]="t().settings.outgoingSubcategories.placeholder" class="flex-grow px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" [value]="newSubcategory()" (input)="newSubcategory.set($event.target.value)" (keyup.enter)="addSetting('outgoingSubcategories')">
-        <button (click)="addSetting('outgoingSubcategories')" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow-sm">{{ t().common.add }}</button>
+      <div class="flex gap-2 mb-4">
+        <input type="text" [placeholder]="t().settings.outgoingSubcategories.placeholder"
+          class="flex-grow px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          [value]="newSubcategory()" (input)="newSubcategory.set($any($event.target).value)"
+          (keyup.enter)="addSetting('outgoingSubcategories')">
+        <button (click)="addSetting('outgoingSubcategories')"
+          class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow-sm">{{ t().common.add
+          }}</button>
       </div>
       <ul class="space-y-2 max-h-48 overflow-y-auto pr-2 border rounded-md p-2">
         @for (sub of outgoingSubcategories(); track sub) {
-           <li class="flex justify-between items-center p-2 rounded-md hover:bg-slate-100">
-            <span class="text-slate-700 text-sm">{{ sub }}</span>
-            <button (click)="deleteSetting('outgoingSubcategories', sub)" class="text-red-500 hover:text-red-700">
-               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
-            </button>
-          </li>
+        <li class="flex justify-between items-center p-2 rounded-md hover:bg-slate-100">
+          <span class="text-slate-700 text-sm">{{ sub }}</span>
+          <button (click)="deleteSetting('outgoingSubcategories', sub)" class="text-red-500 hover:text-red-700">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+            </svg>
+          </button>
+        </li>
         } @empty {
-          <li class="text-center py-4 text-slate-500 text-sm">{{ t().settings.outgoingSubcategories.none }}</li>
+        <li class="text-center py-4 text-slate-500 text-sm">{{ t().settings.outgoingSubcategories.none }}</li>
         }
       </ul>
     </div>

@@ -124,12 +124,12 @@ export const fr = {
       success: '{{count}} mouvements enregistrés avec succès.',
       duplicateDestination: 'Chaque destination ne peut être utilisée qu\'une seule fois dans le même formulaire.',
     },
-     filters: {
-        startDate: 'Date de début',
-        endDate: 'Date de fin',
-        articleSearch: 'Rechercher par article...',
-        allTypes: 'Tous les types',
-        allDestinations: 'Tous Fournisseurs/Destinations',
+    filters: {
+      startDate: 'Date de début',
+      endDate: 'Date de fin',
+      articleSearch: 'Rechercher par article...',
+      allTypes: 'Tous les types',
+      allDestinations: 'Tous Fournisseurs/Destinations',
     },
     table: {
       id: 'ID',
@@ -199,21 +199,21 @@ export const fr = {
       clear: 'Effacer',
     },
     dailyLog: {
-        title: 'Mouvements Journaliers',
-        date: 'Date',
+      title: 'Mouvements Journaliers',
+      date: 'Date',
+      article: 'Article',
+      supplier: 'Fournisseur',
+      destination: 'Destination',
+      allArticles: 'Tous les articles',
+      allSuppliers: 'Tous les fournisseurs',
+      allDestinations: 'Toutes les destinations',
+      noMovements: 'Aucun mouvement pour la date et les filtres sélectionnés.',
+      table: {
         article: 'Article',
-        supplier: 'Fournisseur',
-        destination: 'Destination',
-        allArticles: 'Tous les articles',
-        allSuppliers: 'Tous les fournisseurs',
-        allDestinations: 'Toutes les destinations',
-        noMovements: 'Aucun mouvement pour la date et les filtres sélectionnés.',
-        table: {
-            article: 'Article',
-            type: 'Type',
-            quantity: 'Quantité',
-            dest: 'Fourn./Dest.',
-        }
+        type: 'Type',
+        quantity: 'Quantité',
+        dest: 'Fourn./Dest.',
+      }
     },
   },
   users: {
@@ -236,7 +236,7 @@ export const fr = {
       firstName: { label: 'Prénom' },
       lastName: { label: 'Nom' },
       role: { label: 'Rôle' },
-      password: { 
+      password: {
         label: 'Mot de passe',
         labelOptional: 'Nouveau mot de passe (optionnel)',
         placeholder: 'Laisser vide pour ne pas changer'
@@ -255,12 +255,12 @@ export const fr = {
       title: 'Paramètres d\'Affichage'
     },
     language: {
-        title: 'Langue',
-        description: 'Choisissez la langue d\'affichage de l\'application.',
+      title: 'Langue',
+      description: 'Choisissez la langue d\'affichage de l\'application.',
     },
     dateFormat: {
-        title: 'Format de Date',
-        description: 'Choisissez le format d\'affichage pour les dates dans toute l\'application.'
+      title: 'Format de Date',
+      description: 'Choisissez le format d\'affichage pour les dates dans toute l\'application.'
     },
     categories: {
       title: 'Catégories d\'Articles',
@@ -277,7 +277,7 @@ export const fr = {
       placeholder: 'Nouvelle destination...',
       none: 'Aucune destination ajoutée.',
     },
-     outgoingSubcategories: {
+    outgoingSubcategories: {
       title: 'Sous-catégories de Sortie',
       placeholder: 'Nouvelle sous-catégorie...',
       none: 'Aucune sous-catégorie ajoutée.',
@@ -313,5 +313,44 @@ export const fr = {
     subcategoryInUse: 'Impossible de supprimer la sous-catégorie "{{item}}" : elle est utilisée par un ou plusieurs mouvements.',
     invalidFileFormat: 'Format de fichier invalide. Veuillez charger un fichier Excel (.xlsx or .xls).',
     importFailed: 'Échec de l\'importation des articles. Veuillez vérifier le fichier et réessayer.',
+  },
+  dashboard: {
+    title: 'Tableau de Bord',
+    startDate: 'Date de début',
+    endDate: 'Date de fin',
+    noData: 'Aucune donnée disponible.',
+    dailyLog: {
+      title: 'Mouvements Journaliers',
+      date: 'Date',
+      article: 'Article',
+      supplier: 'Fournisseur',
+      destination: 'Destination',
+      allArticles: 'Tous les articles',
+      allSuppliers: 'Tous les fournisseurs',
+      allDestinations: 'Toutes les destinations',
+      noMovements: 'Aucun mouvement trouvé.',
+      table: {
+        article: 'Article',
+        type: 'Type',
+        quantity: 'Quantité',
+        dest: 'Dest./Fourn.',
+      }
+    },
+    topMoved: {
+      title: 'Articles les plus mouvementés',
+      category: 'Catégorie',
+      allCategories: 'Toutes les catégories',
+      noData: 'Aucune donnée trouvée.',
+      table: {
+        rank: 'Rang',
+        article: 'Article',
+        quantity: 'Quantité',
+      }
+    },
+    analysis: {
+      title: 'Analyse du Stock',
+      incoming: 'Entrées',
+      outgoing: 'Sorties',
+    }
   },
 };

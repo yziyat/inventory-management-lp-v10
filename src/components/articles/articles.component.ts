@@ -26,6 +26,7 @@ type ArticleForImport = Omit<Article, 'id' | 'createdAt' | 'updatedAt' | 'priceH
   standalone: true,
 })
 export class ArticlesComponent {
+  protected readonly Infinity = Infinity;
   private apiService = inject(ApiService);
   private fb: FormBuilder = inject(FormBuilder);
   private translationService = inject(TranslationService);

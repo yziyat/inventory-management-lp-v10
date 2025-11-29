@@ -25,7 +25,7 @@ export const en = {
     users: 'Users',
     settings: 'Settings',
   },
-   login: {
+  login: {
     title: 'Welcome!',
     subtitle: 'Sign in to your account',
     usernameLabel: 'Username',
@@ -125,11 +125,11 @@ export const en = {
       duplicateDestination: 'Each destination can only be used once in the same form.',
     },
     filters: {
-        startDate: 'Start Date',
-        endDate: 'End Date',
-        articleSearch: 'Search by article...',
-        allTypes: 'All Types',
-        allDestinations: 'All Suppliers/Destinations',
+      startDate: 'Start Date',
+      endDate: 'End Date',
+      articleSearch: 'Search by article...',
+      allTypes: 'All Types',
+      allDestinations: 'All Suppliers/Destinations',
     },
     table: {
       id: 'ID',
@@ -199,21 +199,21 @@ export const en = {
       clear: 'Clear',
     },
     dailyLog: {
-        title: 'Daily Movements',
-        date: 'Date',
+      title: 'Daily Movements',
+      date: 'Date',
+      article: 'Article',
+      supplier: 'Supplier',
+      destination: 'Destination',
+      allArticles: 'All Articles',
+      allSuppliers: 'All Suppliers',
+      allDestinations: 'All Destinations',
+      noMovements: 'No movements for the selected date and filters.',
+      table: {
         article: 'Article',
-        supplier: 'Supplier',
-        destination: 'Destination',
-        allArticles: 'All Articles',
-        allSuppliers: 'All Suppliers',
-        allDestinations: 'All Destinations',
-        noMovements: 'No movements for the selected date and filters.',
-        table: {
-            article: 'Article',
-            type: 'Type',
-            quantity: 'Quantity',
-            dest: 'Supp./Dest.',
-        }
+        type: 'Type',
+        quantity: 'Quantity',
+        dest: 'Supp./Dest.',
+      }
     },
   },
   users: {
@@ -236,7 +236,7 @@ export const en = {
       firstName: { label: 'First Name' },
       lastName: { label: 'Last Name' },
       role: { label: 'Role' },
-      password: { 
+      password: {
         label: 'Password',
         labelOptional: 'New Password (optional)',
         placeholder: 'Leave blank to keep current password'
@@ -252,15 +252,15 @@ export const en = {
     title: 'Application Settings',
     deleteConfirmation: 'Are you sure you want to delete "{{item}}"?',
     display: {
-        title: 'Display Settings'
+      title: 'Display Settings'
     },
     language: {
-        title: 'Language',
-        description: 'Choose the display language for the application.',
+      title: 'Language',
+      description: 'Choose the display language for the application.',
     },
     dateFormat: {
-        title: 'Date Format',
-        description: 'Choose the display format for dates throughout the application.'
+      title: 'Date Format',
+      description: 'Choose the display format for dates throughout the application.'
     },
     categories: {
       title: 'Article Categories',
@@ -313,5 +313,44 @@ export const en = {
     subcategoryInUse: 'Cannot delete subcategory "{{item}}": it is in use by one or more movements.',
     invalidFileFormat: 'Invalid file format. Please upload an Excel file (.xlsx or .xls).',
     importFailed: 'Failed to import articles. Please check the file and try again.',
+  },
+  dashboard: {
+    title: 'Dashboard',
+    startDate: 'Start Date',
+    endDate: 'End Date',
+    noData: 'No data available.',
+    dailyLog: {
+      title: 'Daily Movements',
+      date: 'Date',
+      article: 'Article',
+      supplier: 'Supplier',
+      destination: 'Destination',
+      allArticles: 'All Articles',
+      allSuppliers: 'All Suppliers',
+      allDestinations: 'All Destinations',
+      noMovements: 'No movements found.',
+      table: {
+        article: 'Article',
+        type: 'Type',
+        quantity: 'Quantity',
+        dest: 'Dest./Supp.',
+      }
+    },
+    topMoved: {
+      title: 'Top Moved Articles',
+      category: 'Category',
+      allCategories: 'All Categories',
+      noData: 'No data found.',
+      table: {
+        rank: 'Rank',
+        article: 'Article',
+        quantity: 'Quantity',
+      }
+    },
+    analysis: {
+      title: 'Stock Analysis',
+      incoming: 'Incoming',
+      outgoing: 'Outgoing',
+    }
   },
 };

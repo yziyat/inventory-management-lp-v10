@@ -31,6 +31,7 @@ interface BulkMovementRow {
   standalone: true,
 })
 export class MovementsComponent {
+  protected readonly Infinity = Infinity;
   private apiService = inject(ApiService);
   private fb: FormBuilder = inject(FormBuilder);
   private translationService = inject(TranslationService);
