@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { User, UserRole } from '../../models/user.model';
@@ -38,35 +38,27 @@ export class UsersComponent {
     password: ['']
   });
 
-  constructor() {
-    effect(() => {
-      const user = this.editingUser();
-      if (this.isModalOpen()) {
-        this.userForm.get('password')?.clearValidators();
-        if (user) { // Editing
-          this.userForm.patchValue({
-            username: user.username,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            role: user.role,
-            password: ''
-          });
-        } else { // Adding
-          this.userForm.reset({ role: 'viewer', password: '', username: '', firstName: '', lastName: '' });
-          this.userForm.get('password')?.setValidators([Validators.required, Validators.minLength(4)]);
-        }
-        this.userForm.get('password')?.updateValueAndValidity();
-      }
-    });
-  }
+
 
   openAddModal() {
     this.editingUser.set(null);
+    this.userForm.reset({ role: 'viewer', password: '', username: '', firstName: '', lastName: '' });
+    this.userForm.get('password')?.setValidators([Validators.required, Validators.minLength(4)]);
+    this.userForm.get('password')?.updateValueAndValidity();
     this.isModalOpen.set(true);
   }
 
   openEditModal(user: User) {
     this.editingUser.set(user);
+    this.userForm.get('password')?.clearValidators();
+    this.userForm.patchValue({
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+      password: ''
+    });
+    this.userForm.get('password')?.updateValueAndValidity();
     this.isModalOpen.set(true);
   }
 

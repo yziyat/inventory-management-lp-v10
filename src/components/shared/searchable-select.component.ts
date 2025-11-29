@@ -55,11 +55,11 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
 
   searchTerm = signal('');
   isDropdownOpen = signal(false);
-  
+
   private selectedValue: any = null;
-  
-  onChange: (value: any) => void = () => {};
-  onTouched: () => void = () => {};
+
+  onChange: (value: any) => void = () => { };
+  onTouched: () => void = () => { };
 
   filteredOptions = computed(() => {
     const term = this.searchTerm().toLowerCase();
@@ -67,15 +67,25 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
     if (!term) {
       return currentOptions;
     }
-    return currentOptions.filter(option => 
+    return currentOptions.filter(option =>
       option[this.optionTextField()].toLowerCase().includes(term)
     );
   });
-  
+
+
   constructor() {
+    // When options change, re-evaluate the search term display value
     effect(() => {
-      // When options change, re-evaluate the search term display value
-      this.writeValue(this.selectedValue);
+      const currentOptions = this.options();
+      // Use untracked to avoid creating a signal dependency cycle
+      const value = this.selectedValue;
+      const selectedOption = currentOptions.find(opt => opt[this.optionValueField()] === value);
+
+      if (selectedOption) {
+        this.searchTerm.set(selectedOption[this.optionTextField()]);
+      } else if (this.searchTerm() !== '') {
+        this.searchTerm.set('');
+      }
     });
   }
 
@@ -104,11 +114,11 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
 
     // When user types, we should clear the selection as it no longer matches
     if (this.selectedValue !== null) {
-        const selectedOption = this.options()?.find(opt => opt[this.optionValueField()] === this.selectedValue);
-        if (!selectedOption || selectedOption[this.optionTextField()] !== value) {
-          this.selectedValue = null;
-          this.onChange(null);
-        }
+      const selectedOption = this.options()?.find(opt => opt[this.optionValueField()] === this.selectedValue);
+      if (!selectedOption || selectedOption[this.optionTextField()] !== value) {
+        this.selectedValue = null;
+        this.onChange(null);
+      }
     }
   }
 
@@ -124,7 +134,7 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
     this.selectedValue = value;
     const currentOptions = this.options() || [];
     const selectedOption = currentOptions.find(opt => opt[this.optionValueField()] === value);
-    
+
     if (selectedOption) {
       this.searchTerm.set(selectedOption[this.optionTextField()]);
     } else {
