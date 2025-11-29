@@ -181,7 +181,7 @@ export class MovementsComponent {
         const typeMatch = !filters.type || m.type === filters.type;
         const supplierMatch = !filters.supplier || m.supplierDest === filters.supplier;
         const destinationMatch = !filters.destination || m.supplierDest === filters.destination;
-        return articleMatch && startDateMatch && endDateMatch && typeMatch && (supplierMatch || destinationMatch);
+        return articleMatch && startDateMatch && endDateMatch && typeMatch && supplierMatch && destinationMatch;
       })
       .sort((a, b) => {
         let valA, valB;

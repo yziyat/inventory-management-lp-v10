@@ -224,6 +224,7 @@ export class ArticleDetailComponent {
   });
 
   movementForm = this.fb.group({
+    articleId: [null as string | null, Validators.required],
     type: ['Entrée' as Movement['type'], Validators.required],
     quantity: [1, [Validators.required, Validators.min(1)]],
     date: [this.today, Validators.required],
@@ -302,6 +303,10 @@ export class ArticleDetailComponent {
       subcategory: '',
       remarks: ''
     });
+    const currentArticle = this.article();
+    if (currentArticle) {
+      this.movementForm.patchValue({ articleId: currentArticle.id });
+    }
     this.movementType.set('Entrée');
     this.updateFormValidators('Entrée');
     this.isMovementModalOpen.set(true);

@@ -27,8 +27,7 @@
       <div class="md:col-span-2">
         <label for="articleId" class="block mb-2 text-sm font-medium text-slate-900">{{ t().reports.articleLabel
           }}</label>
-        <app-searchable-select formControlName="articleId" [options]="searchableArticlesForReport()"
-          [placeholder]="t().reports.searchPlaceholder">
+        <app-searchable-select formControlName="articleId" [options]="searchableArticlesForReport()" placeholder="">
         </app-searchable-select>
       </div>
       <div class="flex gap-2">
@@ -281,7 +280,7 @@
         <label for="dailyLogArticle" class="block mb-2 text-sm font-medium text-slate-900">{{
           t().reports.dailyLog.article }}</label>
         <app-searchable-select formControlName="articleId" [options]="searchableArticlesForDailyLog()"
-          [placeholder]="t().reports.dailyLog.allArticles"></app-searchable-select>
+          placeholder=""></app-searchable-select>
       </div>
       <div>
         <label for="dailyLogSupplier" class="block mb-2 text-sm font-medium text-slate-900">{{
