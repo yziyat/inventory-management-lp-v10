@@ -14,7 +14,7 @@ import { ArticleDetailComponent } from './article-detail.component';
 import { CustomDatePipe } from '../../pipes/custom-date.pipe';
 import { PaginationComponent } from '../shared/pagination.component';
 
-declare var XLSX: any;
+import * as XLSX from 'xlsx';
 
 type ArticleForImport = Omit<Article, 'id' | 'createdAt' | 'updatedAt' | 'priceHistory'>;
 

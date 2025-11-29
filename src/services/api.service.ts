@@ -1,14 +1,18 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { Article, PriceHistory } from '../models/article.model';
 import { Movement, MovementType } from '../models/movement.model';
 import { User, UserRole } from '../models/user.model';
 import { StockItem } from '../models/stock-item.model';
 import { ApiError } from './api-error';
 import { FirestoreService } from './firestore.service';
+import { FirebaseAuthService } from './firebase-auth.service';
+import { Unsubscribe } from '@angular/fire/firestore';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private firestoreService = inject(FirestoreService);
+  private firebaseAuth = inject(FirebaseAuthService);
+  private unsubscribeFunctions: Unsubscribe[] = [];
 
   private today(): string {
     return new Date().toISOString().split('T')[0];
@@ -38,32 +42,59 @@ export class ApiService {
   settings = this._settings.asReadonly();
 
   constructor() {
-    // Initialize Firestore listeners
-    this.initializeFirestoreListeners();
+    // Initialize Firestore listeners based on auth state
+    effect(() => {
+      const user = this.firebaseAuth.currentFirebaseUser();
+
+      // Always cleanup previous listeners when auth state changes
+      this.stopFirestoreListeners();
+
+      if (user) {
+        this.initializeFirestoreListeners();
+      } else {
+        // Clear data on logout
+        this._articles.set([]);
+        this._movements.set([]);
+        this._users.set([]);
+      }
+    });
+  }
+
+  private stopFirestoreListeners(): void {
+    this.unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
+    this.unsubscribeFunctions = [];
   }
 
   private initializeFirestoreListeners(): void {
     // Listen to articles collection
-    this.firestoreService.onCollectionSnapshot<Article>('articles', (articles) => {
-      this._articles.set(articles.sort((a, b) => a.id > b.id ? -1 : 1));
-    });
+    this.unsubscribeFunctions.push(
+      this.firestoreService.onCollectionSnapshot<Article>('articles', (articles) => {
+        this._articles.set(articles.sort((a, b) => a.id > b.id ? -1 : 1));
+      })
+    );
 
     // Listen to movements collection
-    this.firestoreService.onCollectionSnapshot<Movement>('movements', (movements) => {
-      this._movements.set(movements.sort((a, b) => a.id > b.id ? -1 : 1));
-    });
+    this.unsubscribeFunctions.push(
+      this.firestoreService.onCollectionSnapshot<Movement>('movements', (movements) => {
+        this._movements.set(movements.sort((a, b) => a.id > b.id ? -1 : 1));
+      })
+    );
 
     // Listen to users collection
-    this.firestoreService.onCollectionSnapshot<User>('users', (users) => {
-      this._users.set(users);
-    });
+    this.unsubscribeFunctions.push(
+      this.firestoreService.onCollectionSnapshot<User>('users', (users) => {
+        this._users.set(users);
+      })
+    );
 
     // Listen to settings document
-    this.firestoreService.onDocumentSnapshot('settings', 'global', (settings) => {
-      if (settings) {
-        this._settings.set(settings as any);
-      }
-    });
+    this.unsubscribeFunctions.push(
+      this.firestoreService.onDocumentSnapshot('settings', 'global', (settings) => {
+        if (settings) {
+          this._settings.set(settings as any);
+        }
+      })
+    );
   }
 
   private getStockEffect(m: Movement | Omit<Movement, 'id'>): number {

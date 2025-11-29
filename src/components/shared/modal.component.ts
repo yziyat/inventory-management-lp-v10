@@ -11,7 +11,7 @@ import { ChangeDetectionStrategy, Component, input, output, TemplateRef } from '
         <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col" [class]="modalClass()">
           <div class="flex items-center justify-between p-4 border-b">
             <h3 class="text-xl font-semibold text-gray-800">{{ title() }}</h3>
-            <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600">
+            <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600" aria-label="Close modal">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 
-// This will use the global XLSX variable from the script tag in index.html
-declare var XLSX: any;
+import * as XLSX from 'xlsx';
 
 @Injectable({ providedIn: 'root' })
 export class ExportService {
@@ -53,7 +52,7 @@ export class ExportService {
   private getFormattedTimestamp(): string {
     const now = new Date();
     const pad = (num: number) => num.toString().padStart(2, '0');
-    
+
     const year = now.getFullYear();
     const month = pad(now.getMonth() + 1);
     const day = pad(now.getDate());

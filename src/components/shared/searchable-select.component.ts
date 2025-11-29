@@ -86,7 +86,7 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnInit, 
       } else if (this.searchTerm() !== '') {
         this.searchTerm.set('');
       }
-    });
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit(): void {
