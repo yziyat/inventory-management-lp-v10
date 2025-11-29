@@ -27,11 +27,13 @@ type ReportFilters = {
   stockFinal: Set<number>;
 }
 
+import { NgClass } from '@angular/common';
+
 @Component({
   selector: 'app-reports',
   templateUrl: './reports.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, CustomDatePipe, SearchableSelectComponent, ModalComponent],
+  imports: [ReactiveFormsModule, CustomDatePipe, SearchableSelectComponent, ModalComponent, NgClass],
   standalone: true,
 })
 export class ReportsComponent implements OnInit, OnDestroy {

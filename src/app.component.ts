@@ -70,4 +70,10 @@ export class AppComponent {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
+
+  getNavLabel(label: string): string {
+    const key = label.toLowerCase().replace(' ', '');
+    const nav = this.t().nav as Record<string, string>;
+    return nav[key] || label;
+  }
 }
