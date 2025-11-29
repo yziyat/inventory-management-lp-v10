@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    function isEditor() {
+      return isAuthenticated() && (
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'editor'
+      );
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own data
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      // Only admins can create/update/delete users (except initial creation which is handled by Auth trigger or client-side if allowed)
+      // For now, allowing creation if auth matches ID (for initial signup) and updates if admin
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update, delete: if isAdmin();
+    }
+
+    // Articles collection
+    match /articles/{articleId} {
+      allow read: if isAuthenticated();
+      allow write: if isEditor();
+    }
+
+    // Movements collection
+    match /movements/{movementId} {
+      allow read: if isAuthenticated();
+      allow write: if isEditor();
+    }
+    
+    // Settings collection
+    match /settings/{settingId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Stock collection (if it exists as separate collection)
+    match /stock/{stockId} {
+      allow read: if isAuthenticated();
+      allow write: if isEditor(); // Derived data, usually updated via Cloud Functions or client-side logic
+    }
+  }
+}

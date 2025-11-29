@@ -40,6 +40,13 @@ export class AuthService {
     return this.firebaseAuth.signUp(email, password, userData);
   }
 
+  async sendEmailVerification(user: any): Promise<void> {
+    // This is handled inside signUp in FirebaseAuthService, but if we need to resend:
+    // return this.firebaseAuth.sendEmailVerification(user);
+    // For now, we don't need to expose it directly as it's automatic on signup
+    return Promise.resolve();
+  }
+
   /**
    * Logout current user
    */

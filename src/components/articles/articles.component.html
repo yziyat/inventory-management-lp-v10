@@ -93,7 +93,7 @@
         <tbody>
           @for (article of paginatedArticles(); track article.id) {
           <tr class="bg-white border-b border-gray-200 hover:bg-gray-50">
-            <td class="px-6 py-4 text-gray-700">{{ article.id }}</td>
+            <td class="px-6 py-4 text-gray-700">{{ article.displayId || '-' }}</td>
             <td class="px-6 py-4 font-medium text-gray-900 text-left">
               <button (click)="openDetailModal(article)" class="text-sky-600 hover:underline text-left font-semibold">
                 {{ article.name }}

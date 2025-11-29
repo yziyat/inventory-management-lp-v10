@@ -136,8 +136,13 @@ export class ApiService {
       throw new ApiError('ARTICLE_CODE_EXISTS');
     }
 
+    // Calculate next displayId
+    const maxDisplayId = existingArticles.reduce((max, a) => Math.max(max, a.displayId || 0), 0);
+    const nextDisplayId = maxDisplayId + 1;
+
     const newArticle: Omit<Article, 'id'> = {
       ...article,
+      displayId: nextDisplayId,
       createdAt: this.today(),
       updatedAt: this.today(),
       priceHistory: [{ price: article.price, date: this.today() }]

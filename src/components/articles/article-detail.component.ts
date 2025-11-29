@@ -209,7 +209,7 @@ export class ArticleDetailComponent {
     const art = this.article();
     if (!art) return 0;
     const stockItem = this.apiService.stock().find(s => s.id === art.id);
-    return stockItem?.stock || 0;
+    return stockItem?.currentStock || 0;
   });
   today = new Date().toISOString().split('T')[0];
 

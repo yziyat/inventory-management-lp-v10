@@ -5,6 +5,7 @@ import {
     createUserWithEmailAndPassword,
     signOut as firebaseSignOut,
     onAuthStateChanged,
+    sendEmailVerification,
     User as FirebaseUser
 } from '@angular/fire/auth';
 import {
@@ -12,6 +13,11 @@ import {
     doc,
     setDoc,
     getDoc,
+    collection,
+    query,
+    orderBy,
+    limit,
+    getDocs,
     DocumentReference
 } from '@angular/fire/firestore';
 import { User, UserRole } from '../models/user.model';
@@ -53,18 +59,28 @@ export class FirebaseAuthService {
             const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
             const firebaseUser = userCredential.user;
 
+            // Send email verification
+            await sendEmailVerification(firebaseUser);
+
+            // Get the next display ID
+            const nextDisplayId = await this.getNextDisplayId();
+
             // Create user document in Firestore
             const newUser: User = {
                 id: firebaseUser.uid,
+                displayId: nextDisplayId,
                 username: userData.username,
                 firstName: userData.firstName,
                 lastName: userData.lastName,
-                role: userData.role,
+                role: 'viewer', // Default role
+                status: 'pending', // Default status
+                emailVerified: false,
                 password: '' // Don't store password in Firestore
             };
 
             await this.saveUserData(firebaseUser.uid, newUser);
-            this.currentUser.set(newUser);
+            // Do not set currentUser here, force them to login after verification
+            // this.currentUser.set(newUser); 
 
             return newUser;
         } catch (error: any) {
@@ -83,6 +99,29 @@ export class FirebaseAuthService {
 
             // Load user data from Firestore
             const userData = await this.getUserData(firebaseUser.uid);
+
+            // Check if email is verified
+            if (!firebaseUser.emailVerified) {
+                await this.signOut();
+                throw new Error('Please verify your email address before logging in.');
+            }
+
+            // Check if account is approved
+            if (userData.status === 'pending') {
+                await this.signOut();
+                throw new Error('Your account is pending approval by an administrator.');
+            }
+
+            if (userData.status === 'rejected') {
+                await this.signOut();
+                throw new Error('Your account has been rejected.');
+            }
+
+            if (userData.status === 'suspended') {
+                await this.signOut();
+                throw new Error('Your account has been suspended. Please contact the administrator.');
+            }
+
             this.currentUser.set(userData);
 
             return userData;
@@ -134,6 +173,13 @@ export class FirebaseAuthService {
     private handleAuthError(error: any): Error {
         let message = 'Authentication error';
 
+        if (error.message === 'Please verify your email address before logging in.' ||
+            error.message === 'Your account is pending approval by an administrator.' ||
+            error.message === 'Your account has been rejected.' ||
+            error.message === 'Your account has been suspended. Please contact the administrator.') {
+            return error;
+        }
+
         switch (error.code) {
             case 'auth/email-already-in-use':
                 message = 'This email is already in use';
@@ -184,5 +230,40 @@ export class FirebaseAuthService {
     isEditor(): boolean {
         const role = this.currentUser()?.role;
         return role === 'admin' || role === 'editor';
+    }
+
+    /**
+     * Get the next display ID for a new user
+     */
+    private async getNextDisplayId(): Promise<number> {
+        try {
+            const usersRef = collection(this.firestore, 'users');
+            const q = query(usersRef, orderBy('displayId', 'desc'), limit(1));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                return 1;
+            }
+
+            const lastUser = querySnapshot.docs[0].data() as User;
+            return (lastUser.displayId || 0) + 1;
+        } catch (error) {
+            console.error('Error getting next display ID:', error);
+            // Fallback: if query fails (e.g. missing index), try to get all users and find max
+            try {
+                const usersRef = collection(this.firestore, 'users');
+                const querySnapshot = await getDocs(usersRef);
+                if (querySnapshot.empty) return 1;
+
+                const maxId = querySnapshot.docs.reduce((max, doc) => {
+                    const data = doc.data() as User;
+                    return Math.max(max, data.displayId || 0);
+                }, 0);
+                return maxId + 1;
+            } catch (e) {
+                console.error('Fallback error:', e);
+                return 1;
+            }
+        }
     }
 }
