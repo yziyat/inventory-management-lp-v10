@@ -10,7 +10,7 @@ import { SearchableSelectComponent } from '../shared/searchable-select.component
 import { ModalComponent } from '../shared/modal.component';
 
 interface DetailedReportRow {
-  articleId: number;
+  articleId: string;
   articleName: string;
   articleCode: string;
   stockInitial: number;
@@ -109,7 +109,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
   });
 
   userNameMap = computed(() => {
-    const map = new Map<number, string>();
+    const map = new Map<string, string>();
     this.apiService.users().forEach(u => map.set(u.id, `${u.firstName} ${u.lastName}`));
     return map;
   });
@@ -160,7 +160,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
     return this.apiService.movements()
       .filter(m => {
         const dateMatch = m.date === filters.date;
-        const articleMatch = !filters.articleId || m.articleId === Number(filters.articleId);
+        const articleMatch = !filters.articleId || m.articleId === filters.articleId;
 
         const supplier = filters.supplier;
         const destination = filters.destination;
@@ -179,7 +179,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
         return dateMatch && articleMatch && supplierDestMatch;
       })
-      .sort((a, b) => b.id - a.id);
+      .sort((a, b) => b.id.localeCompare(a.id));
   });
 
   applyDailyLogFilters() { this.appliedDailyLogFilters.set(this.dailyLogFiltersForm.value); }
@@ -220,7 +220,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
     const allArticles = this.apiService.articles();
     const destinations = this.reportDestinations();
 
-    const selectedArticleId = articleId ? Number(articleId) : null;
+    const selectedArticleId = articleId ? String(articleId) : null;
 
     const filteredArticles = selectedArticleId
       ? allArticles.filter(a => a.id === selectedArticleId)
@@ -391,7 +391,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
       );
     }
 
-    this.modalMovements.set(relevantMovements.sort((a, b) => b.id - a.id));
+    this.modalMovements.set(relevantMovements.sort((a, b) => b.id.localeCompare(a.id)));
     this.isDetailModalOpen.set(true);
   }
 

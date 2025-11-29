@@ -211,7 +211,7 @@ export class ArticleDetailComponent {
     if (!articleId) return [];
     return this.allMovements()
       .filter(m => m.articleId === articleId)
-      .sort((a, b) => b.id - a.id);
+      .sort((a, b) => b.id.localeCompare(a.id));
   });
 
   paginatedMovements = computed(() => {

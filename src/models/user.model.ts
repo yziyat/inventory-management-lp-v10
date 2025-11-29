@@ -1,7 +1,7 @@
 export type UserRole = 'admin' | 'editor' | 'viewer';
 
 export interface User {
-  id: number;
+  id: string;
   username: string;
   firstName: string;
   lastName: string;

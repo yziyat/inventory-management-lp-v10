@@ -4,7 +4,7 @@ export interface PriceHistory {
 }
 
 export interface Article {
-  id: number;
+  id: string;
   name: string;
   code: string;
   category: string;

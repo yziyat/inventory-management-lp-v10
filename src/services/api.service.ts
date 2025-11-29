@@ -75,7 +75,7 @@ export class ApiService {
   }
 
   stock = computed<StockItem[]>(() => {
-    const stockMap = new Map<number, number>();
+    const stockMap = new Map<string, number>();
     this._movements().forEach(m => {
       const current = stockMap.get(m.articleId) ?? 0;
       stockMap.set(m.articleId, current + this.getStockEffect(m));
@@ -113,7 +113,7 @@ export class ApiService {
     };
 
     const id = await this.firestoreService.addDocument<Omit<Article, 'id'>>('articles', newArticle);
-    return { ...newArticle, id: parseInt(id) } as Article;
+    return { ...newArticle, id } as Article;
   }
 
   async addArticles(articles: Omit<Article, 'id' | 'createdAt' | 'updatedAt' | 'priceHistory'>[]): Promise<Article[]> {
@@ -148,7 +148,7 @@ export class ApiService {
         priceHistory: [{ price: article.price, date: this.today() }]
       };
       const id = await this.firestoreService.addDocument<Omit<Article, 'id'>>('articles', newArticle);
-      newArticles.push({ ...newArticle, id: parseInt(id) } as Article);
+      newArticles.push({ ...newArticle, id } as Article);
     }
     return newArticles;
   }
@@ -187,7 +187,7 @@ export class ApiService {
     return articleToSave;
   }
 
-  async deleteArticle(id: number): Promise<void> {
+  async deleteArticle(id: string): Promise<void> {
     if (this._movements().some(m => m.articleId === id)) {
       throw new ApiError("ARTICLE_IN_USE");
     }
@@ -196,7 +196,7 @@ export class ApiService {
 
   // ============ MOVEMENTS ============
 
-  private generateMovementId(): number {
+  private generateMovementId(): string {
     const now = new Date();
     const pad = (num: number) => num.toString().padStart(2, '0');
 
@@ -208,7 +208,7 @@ export class ApiService {
     const seconds = pad(now.getSeconds());
 
     // DDMMYYHHMMSS
-    return Number(`${day}${month}${year}${hours}${minutes}${seconds}`);
+    return `${day}${month}${year}${hours}${minutes}${seconds}`;
   }
 
   async addMovement(movement: Omit<Movement, 'id'>): Promise<Movement> {
@@ -275,7 +275,7 @@ export class ApiService {
     return updatedMovement;
   }
 
-  async deleteMovement(id: number): Promise<void> {
+  async deleteMovement(id: string): Promise<void> {
     const movementToDelete = this._movements().find(m => m.id === id);
     if (!movementToDelete) return;
 

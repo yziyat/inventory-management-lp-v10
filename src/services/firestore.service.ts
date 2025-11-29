@@ -59,7 +59,7 @@ export class FirestoreService {
     /**
      * Set a document with a specific ID (creates or overwrites)
      */
-    async setDocument<T>(collectionName: string, id: string, data: T): Promise<void> {
+    async setDocument<T extends object>(collectionName: string, id: string, data: T): Promise<void> {
         const docRef = doc(this.firestore, collectionName, id);
         await setDoc(docRef, data);
     }

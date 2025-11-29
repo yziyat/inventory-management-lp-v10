@@ -131,7 +131,7 @@ export class ArticlesComponent {
   });
 
   articleForm = this.fb.group({
-    id: [null as number | null],
+    id: [null as string | null],
     name: ['', Validators.required],
     code: ['', Validators.required],
     category: ['', Validators.required],

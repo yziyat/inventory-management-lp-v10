@@ -1,9 +1,9 @@
 export type MovementType = 'Entrée' | 'Sortie' | 'Ajustement' | 'Périmé / Rebut';
 
 export interface Movement {
-  id: number;
-  articleId: number;
-  userId: number;
+  id: string;
+  articleId: string;
+  userId: string;
   type: MovementType;
   quantity: number;
   date: string; // YYYY-MM-DD

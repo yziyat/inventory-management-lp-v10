@@ -80,8 +80,8 @@ export class MovementsComponent {
   currentPage = signal(1);
 
   movementForm = this.fb.group({
-    id: [null as number | null],
-    articleId: [null as number | null, Validators.required],
+    id: [null as string | null],
+    articleId: [null as string | null, Validators.required],
     type: ['Entrée' as Movement['type'], Validators.required],
     quantity: [1, [Validators.required, Validators.min(1)]],
     date: [this.today, Validators.required],
@@ -92,7 +92,7 @@ export class MovementsComponent {
   });
 
   singleMovementType = signal<MovementType>(this.movementForm.get('type')!.value!);
-  singleFormArticleId = signal<number | null>(null);
+  singleFormArticleId = signal<string | null>(null);
 
   singleFormSelectedArticleStock = computed(() => {
     const articleId = this.singleFormArticleId();
@@ -114,14 +114,14 @@ export class MovementsComponent {
   }
 
   bulkMovementForm = this.fb.group({
-    articleId: [null as number | null, Validators.required],
+    articleId: [null as string | null, Validators.required],
     date: [this.today, Validators.required],
     type: ['Sortie' as Movement['type'], Validators.required],
     movements: this.fb.array([], [Validators.required, this.uniqueDestinationsValidator]),
   });
 
   bulkMovementType = signal<MovementType>(this.bulkMovementForm.get('type')!.value!);
-  bulkFormArticleId = signal<number | null>(null);
+  bulkFormArticleId = signal<string | null>(null);
 
   bulkFormSelectedArticleStock = computed(() => {
     const articleId = this.bulkFormArticleId();
@@ -154,7 +154,7 @@ export class MovementsComponent {
   });
 
   articleNameMap = computed(() => {
-    const map = new Map<number, string>();
+    const map = new Map<string, string>();
     this.articles().forEach(a => map.set(a.id, `${a.name} (${a.code})`));
     return map;
   });
@@ -169,7 +169,7 @@ export class MovementsComponent {
     const dir = this.sortDirection();
     const articleSearchTerm = (filters.articleSearch || '').toLowerCase();
 
-    const getArticleName = (id: number) => articles.find(a => a.id === id)?.name || '';
+    const getArticleName = (id: string) => articles.find(a => a.id === id)?.name || '';
 
     return movements
       .filter(m => {
@@ -257,11 +257,11 @@ export class MovementsComponent {
     });
 
     this.movementForm.get('articleId')?.valueChanges.subscribe(id => {
-      this.singleFormArticleId.set(id ? Number(id) : null);
+      this.singleFormArticleId.set(id ? String(id) : null);
     });
 
     this.bulkMovementForm.get('articleId')?.valueChanges.subscribe(id => {
-      this.bulkFormArticleId.set(id ? Number(id) : null);
+      this.bulkFormArticleId.set(id ? String(id) : null);
     });
 
     this.addBulkMovementRow();
@@ -322,7 +322,7 @@ export class MovementsComponent {
     this.resetMovementForm();
   }
 
-  openDetailModal(articleId: number) {
+  openDetailModal(articleId: string) {
     const article = this.apiService.articles().find(a => a.id === articleId);
     if (article) {
       this.selectedArticle.set(article);
@@ -412,7 +412,7 @@ export class MovementsComponent {
       const formValue = this.movementForm.getRawValue();
       const movementData = {
         ...formValue,
-        articleId: Number(formValue.articleId),
+        articleId: String(formValue.articleId),
         userId: this.authService.currentUser()!.id,
       };
       const { id, ...newMovement } = movementData;
@@ -438,7 +438,7 @@ export class MovementsComponent {
       const movementData = {
         ...this.editingMovement(),
         ...formValue,
-        articleId: Number(formValue.articleId),
+        articleId: String(formValue.articleId),
       };
       await this.apiService.updateMovement(movementData as Movement);
       this.notificationService.showSuccess(this.t().common.saveSuccess);
@@ -466,7 +466,7 @@ export class MovementsComponent {
     };
 
     const bulkFormValue = this.bulkMovementForm.getRawValue();
-    const articleId = Number(bulkFormValue.articleId);
+    const articleId = String(bulkFormValue.articleId);
     const article = this.apiService.articles().find(a => a.id === articleId);
     if (!article) return;
 

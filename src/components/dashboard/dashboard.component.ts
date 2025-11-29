@@ -77,7 +77,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
     return this.movements()
       .filter(m => {
         const dateMatch = m.date === filters.date;
-        const articleMatch = !filters.articleId || m.articleId === Number(filters.articleId);
+        const articleMatch = !filters.articleId || m.articleId === filters.articleId;
 
         const supplier = filters.supplier;
         const destination = filters.destination;
@@ -94,7 +94,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
 
         return dateMatch && articleMatch && supplierDestMatch;
       })
-      .sort((a, b) => b.id - a.id);
+      .sort((a, b) => b.id.localeCompare(a.id));
   });
 
   // --- Widget 2: Top Moved Items Data ---
@@ -103,7 +103,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
     const articleMap = this.articleMap();
     if (!filters.startDate || !filters.endDate) return [];
 
-    const items: { [id: number]: { name: string, quantity: number } } = {};
+    const items: { [id: string]: { name: string, quantity: number } } = {};
 
     this.movements().forEach(m => {
       if (m.date >= filters.startDate! && m.date <= filters.endDate!) {
@@ -136,7 +136,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
 
       const dateMatch = m.date >= filters.startDate! && m.date <= filters.endDate!;
       const categoryMatch = !filters.category || article.category === filters.category;
-      const articleMatch = !filters.articleId || m.articleId === Number(filters.articleId);
+      const articleMatch = !filters.articleId || m.articleId === filters.articleId;
 
       return dateMatch && categoryMatch && articleMatch;
     });
