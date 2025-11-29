@@ -1,42 +1,32 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { Article, PriceHistory } from '../models/article.model';
 import { Movement, MovementType } from '../models/movement.model';
 import { User, UserRole } from '../models/user.model';
 import { StockItem } from '../models/stock-item.model';
 import { ApiError } from './api-error';
+import { FirestoreService } from './firestore.service';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  
+  private firestoreService = inject(FirestoreService);
+
   private today(): string {
     return new Date().toISOString().split('T')[0];
   }
 
-  private _articles = signal<Article[]>([
-    { id: 1, name: 'Doliprane 1000mg', code: 'DOL1000', category: 'Médicaments', unit: 'Boîte', price: 25.50, alert: 10, description: 'Antalgique et antipyrétique', createdAt: '2024-01-10', updatedAt: '2024-07-15', priceHistory: [{ price: 25.50, date: '2024-01-10' }] },
-    { id: 2, name: 'Seringue 5ml', code: 'SER005', category: 'Fournitures', unit: 'Unité', price: 2.00, alert: 100, description: 'Seringue stérile à usage unique', createdAt: '2024-01-10', updatedAt: '2024-01-10', priceHistory: [{ price: 2.00, date: '2024-01-10' }] },
-    { id: 3, name: 'Compresses stériles', code: 'COMP01', category: 'Consommables', unit: 'Paquet', price: 15.00, alert: 20, description: 'Paquet de 10 compresses', createdAt: '2024-02-20', updatedAt: '2024-02-20', priceHistory: [{ price: 15.00, date: '2024-02-20' }] },
-    { id: 4, name: 'Gants en latex', code: 'GANT-M', category: 'Fournitures', unit: 'Boîte', price: 80.00, alert: 5, description: 'Boîte de 100 gants taille M', createdAt: '2024-03-01', updatedAt: '2024-06-01', priceHistory: [{ price: 75.00, date: '2024-03-01'}, { price: 80.00, date: '2024-06-01'}] },
-  ]);
-  private _nextArticleId = 5;
-
-  private _movements = signal<Movement[]>([
-    { id: 1, articleId: 1, userId: 1, type: 'Entrée', quantity: 50, date: '2024-07-01', refDoc: 'CMD-001', supplierDest: 'Fournisseur A', remarks: '' },
-    { id: 2, articleId: 2, userId: 1, type: 'Entrée', quantity: 500, date: '2024-07-01', refDoc: 'CMD-001', supplierDest: 'Fournisseur A', remarks: '' },
-    { id: 3, articleId: 1, userId: 2, type: 'Sortie', quantity: 5, date: '2024-07-05', refDoc: 'BS-001', supplierDest: 'Service 1', remarks: 'Dispensation patient', subcategory: 'Dispensation Patient' },
-    { id: 4, articleId: 3, userId: 1, type: 'Entrée', quantity: 30, date: '2024-07-06', refDoc: 'CMD-002', supplierDest: 'Dépôt Central', remarks: '' },
-    { id: 5, articleId: 2, userId: 2, type: 'Sortie', quantity: 100, date: '2024-07-08', refDoc: 'BS-002', supplierDest: 'Service 1', remarks: '', subcategory: 'Dotation Service' },
-    { id: 6, articleId: 1, userId: 2, type: 'Sortie', quantity: 10, date: '2024-07-10', refDoc: 'BS-003', supplierDest: 'Service 1', remarks: '', subcategory: 'Dispensation Patient' },
-  ]);
-
-  private _users = signal<User[]>([
-    { id: 1, username: 'admin', firstName: 'Admin', lastName: 'User', role: 'admin', password: 'admin' },
-    { id: 2, username: 'editor.user', firstName: 'Editor', lastName: 'User', role: 'editor', password: 'password' },
-    { id: 3, username: 'viewer.user', firstName: 'Viewer', lastName: 'User', role: 'viewer', password: 'password' },
-  ]);
-
-  private _settings = signal<{ categories: string[]; suppliers: string[]; destinations: string[], outgoingSubcategories: string[] }>({
+  // Signals for data - will be updated by Firestore listeners
+  private _articles = signal<Article[]>([]);
+  private _movements = signal<Movement[]>([]);
+  private _users = signal<User[]>([]);
+  private _settings = signal<{
+    categories: string[];
+    units: string[];
+    suppliers: string[];
+    destinations: string[],
+    outgoingSubcategories: string[]
+  }>({
     categories: ['Médicaments', 'Fournitures', 'Consommables', 'Autres'],
+    units: ['Boîte', 'Unité', 'Paquet', 'Flacon', 'Tube'],
     suppliers: ['Fournisseur A', 'Dépôt Central'],
     destinations: ['Service 1', 'Périmé'],
     outgoingSubcategories: ['Dispensation Patient', 'Dotation Service', 'Transfert Inter-dépôt', 'Autre']
@@ -46,10 +36,39 @@ export class ApiService {
   movements = this._movements.asReadonly();
   users = this._users.asReadonly();
   settings = this._settings.asReadonly();
-  
+
+  constructor() {
+    // Initialize Firestore listeners
+    this.initializeFirestoreListeners();
+  }
+
+  private initializeFirestoreListeners(): void {
+    // Listen to articles collection
+    this.firestoreService.onCollectionSnapshot<Article>('articles', (articles) => {
+      this._articles.set(articles.sort((a, b) => a.id > b.id ? -1 : 1));
+    });
+
+    // Listen to movements collection
+    this.firestoreService.onCollectionSnapshot<Movement>('movements', (movements) => {
+      this._movements.set(movements.sort((a, b) => a.id > b.id ? -1 : 1));
+    });
+
+    // Listen to users collection
+    this.firestoreService.onCollectionSnapshot<User>('users', (users) => {
+      this._users.set(users);
+    });
+
+    // Listen to settings document
+    this.firestoreService.onDocumentSnapshot('settings', 'global', (settings) => {
+      if (settings) {
+        this._settings.set(settings as any);
+      }
+    });
+  }
+
   private getStockEffect(m: Movement | Omit<Movement, 'id'>): number {
     if (m.type === 'Entrée' || m.type === 'Ajustement') {
-        return m.quantity;
+      return m.quantity;
     }
     // Sortie, Périmé / Rebut
     return -m.quantity;
@@ -70,33 +89,34 @@ export class ApiService {
 
   // Helpers for validation
   normalizeString(s: string): string {
-    return s.toLowerCase().trim().replace(/\s+/g, ' ');
+    return s.toLowerCase().trim().replace(/\\s+/g, ' ');
   }
-  
+
   private areSimilar(str1: string, str2: string): boolean {
     return this.normalizeString(str1) === this.normalizeString(str2);
   }
 
-  // Articles
-  addArticle(article: Omit<Article, 'id' | 'createdAt' | 'updatedAt' | 'priceHistory'>): Article {
+  // ============ ARTICLES ============
+
+  async addArticle(article: Omit<Article, 'id' | 'createdAt' | 'updatedAt' | 'priceHistory'>): Promise<Article> {
     const existingArticles = this._articles();
-    
+
     if (existingArticles.some(a => a.code.toLowerCase() === article.code.toLowerCase())) {
-        throw new ApiError('ARTICLE_CODE_EXISTS');
+      throw new ApiError('ARTICLE_CODE_EXISTS');
     }
 
-    const newArticle: Article = { 
-      ...article, 
-      id: this._nextArticleId++,
+    const newArticle: Omit<Article, 'id'> = {
+      ...article,
       createdAt: this.today(),
       updatedAt: this.today(),
       priceHistory: [{ price: article.price, date: this.today() }]
     };
-    this._articles.update(articles => [...articles, newArticle]);
-    return newArticle;
+
+    const id = await this.firestoreService.addDocument<Omit<Article, 'id'>>('articles', newArticle);
+    return { ...newArticle, id: parseInt(id) } as Article;
   }
-  
-  addArticles(articles: Omit<Article, 'id' | 'createdAt' | 'updatedAt' | 'priceHistory'>[]): Article[] {
+
+  async addArticles(articles: Omit<Article, 'id' | 'createdAt' | 'updatedAt' | 'priceHistory'>[]): Promise<Article[]> {
     const existingArticles = this._articles();
     const existingCodes = new Set(existingArticles.map(a => a.code.toLowerCase()));
     const existingNameUnitsNormalized = new Set(existingArticles.map(a => `${this.normalizeString(a.name)}|${a.unit}`));
@@ -105,51 +125,51 @@ export class ApiService {
     const importNameUnits = new Set<string>();
 
     for (const article of articles) {
-        const lowerCode = article.code.toLowerCase();
-        const normNameUnit = `${this.normalizeString(article.name)}|${article.unit}`;
+      const lowerCode = article.code.toLowerCase();
+      const normNameUnit = `${this.normalizeString(article.name)}|${article.unit}`;
 
-        if (existingCodes.has(lowerCode) || importCodes.has(lowerCode)) {
-            throw new ApiError('ARTICLE_CODE_EXISTS');
-        }
-        if (existingNameUnitsNormalized.has(normNameUnit) || importNameUnits.has(normNameUnit)) {
-            throw new ApiError('ARTICLE_NAME_UNIT_EXISTS');
-        }
+      if (existingCodes.has(lowerCode) || importCodes.has(lowerCode)) {
+        throw new ApiError('ARTICLE_CODE_EXISTS');
+      }
+      if (existingNameUnitsNormalized.has(normNameUnit) || importNameUnits.has(normNameUnit)) {
+        throw new ApiError('ARTICLE_NAME_UNIT_EXISTS');
+      }
 
-        importCodes.add(lowerCode);
-        importNameUnits.add(normNameUnit);
+      importCodes.add(lowerCode);
+      importNameUnits.add(normNameUnit);
     }
-    
-    const newArticles = articles.map(article => {
-       const newArticle: Article = { 
-        ...article, 
-        id: this._nextArticleId++,
+
+    const newArticles: Article[] = [];
+    for (const article of articles) {
+      const newArticle: Omit<Article, 'id'> = {
+        ...article,
         createdAt: this.today(),
         updatedAt: this.today(),
         priceHistory: [{ price: article.price, date: this.today() }]
       };
-      return newArticle;
-    });
-    this._articles.update(current => [...current, ...newArticles]);
+      const id = await this.firestoreService.addDocument<Omit<Article, 'id'>>('articles', newArticle);
+      newArticles.push({ ...newArticle, id: parseInt(id) } as Article);
+    }
     return newArticles;
   }
 
-  updateArticle(updatedArticle: Article): Article {
+  async updateArticle(updatedArticle: Article): Promise<Article> {
     const existingArticles = this._articles();
     const originalArticle = existingArticles.find(a => a.id === updatedArticle.id);
     if (!originalArticle) {
       throw new ApiError('ARTICLE_NOT_FOUND');
     }
-    
+
     if (originalArticle.code.toLowerCase() !== updatedArticle.code.toLowerCase()) {
-        if (existingArticles.some(a => a.id !== updatedArticle.id && a.code.toLowerCase() === updatedArticle.code.toLowerCase())) {
-            throw new ApiError('ARTICLE_CODE_EXISTS');
-        }
+      if (existingArticles.some(a => a.id !== updatedArticle.id && a.code.toLowerCase() === updatedArticle.code.toLowerCase())) {
+        throw new ApiError('ARTICLE_CODE_EXISTS');
+      }
     }
 
     if (!this.areSimilar(originalArticle.name, updatedArticle.name) || originalArticle.unit !== updatedArticle.unit) {
-        if (existingArticles.some(a => a.id !== updatedArticle.id && this.areSimilar(a.name, updatedArticle.name) && a.unit === updatedArticle.unit)) {
-            throw new ApiError('ARTICLE_NAME_UNIT_EXISTS');
-        }
+      if (existingArticles.some(a => a.id !== updatedArticle.id && this.areSimilar(a.name, updatedArticle.name) && a.unit === updatedArticle.unit)) {
+        throw new ApiError('ARTICLE_NAME_UNIT_EXISTS');
+      }
     }
 
     const newHistory = [...originalArticle.priceHistory];
@@ -163,24 +183,23 @@ export class ApiService {
       priceHistory: newHistory
     };
 
-    this._articles.update(articles =>
-      articles.map(a => (a.id === articleToSave.id ? articleToSave : a))
-    );
+    await this.firestoreService.setDocument('articles', articleToSave.id.toString(), articleToSave);
     return articleToSave;
   }
 
-  deleteArticle(id: number): void {
+  async deleteArticle(id: number): Promise<void> {
     if (this._movements().some(m => m.articleId === id)) {
-       throw new ApiError("ARTICLE_IN_USE");
+      throw new ApiError("ARTICLE_IN_USE");
     }
-    this._articles.update(articles => articles.filter(a => a.id !== id));
+    await this.firestoreService.deleteDocument('articles', id.toString());
   }
 
-  // Movements
+  // ============ MOVEMENTS ============
+
   private generateMovementId(): number {
     const now = new Date();
     const pad = (num: number) => num.toString().padStart(2, '0');
-    
+
     const day = pad(now.getDate());
     const month = pad(now.getMonth() + 1);
     const year = now.getFullYear().toString().slice(-2);
@@ -192,9 +211,9 @@ export class ApiService {
     return Number(`${day}${month}${year}${hours}${minutes}${seconds}`);
   }
 
-  addMovement(movement: Omit<Movement, 'id'>): Movement {
+  async addMovement(movement: Omit<Movement, 'id'>): Promise<Movement> {
     const effect = this.getStockEffect(movement);
-    // Do not check for sufficient stock on 'Ajustement' type movements, as they are for correction.
+    // Do not check for sufficient stock on 'Ajustement' type movements
     if (effect < 0 && movement.type !== 'Ajustement') {
       const stockItem = this.stock().find(s => s.id === movement.articleId);
       const currentStock = stockItem?.currentStock || 0;
@@ -202,18 +221,19 @@ export class ApiService {
       if (currentStock < quantityToWithdraw) {
         const articleName = this._articles().find(a => a.id === movement.articleId)?.name || 'the article';
         throw new ApiError('INSUFFICIENT_STOCK', {
-            articleName,
-            available: currentStock,
-            required: quantityToWithdraw
+          articleName,
+          available: currentStock,
+          required: quantityToWithdraw
         });
       }
     }
+
     const newMovement: Movement = { ...movement, id: this.generateMovementId() };
-    this._movements.update(movements => [...movements, newMovement].sort((a,b) => b.id - a.id));
+    await this.firestoreService.setDocument('movements', newMovement.id.toString(), newMovement);
     return newMovement;
   }
 
-  updateMovement(updatedMovement: Movement): Movement {
+  async updateMovement(updatedMovement: Movement): Promise<Movement> {
     const originalMovement = this._movements().find(m => m.id === updatedMovement.id);
     if (!originalMovement) {
       throw new ApiError('MOVEMENT_NOT_FOUND');
@@ -223,102 +243,115 @@ export class ApiService {
     const updatedEffect = this.getStockEffect(updatedMovement);
 
     if (originalMovement.articleId === updatedMovement.articleId) {
-        const stock = this.stock().find(s => s.id === updatedMovement.articleId)!;
-        const stockWithoutOriginal = stock.currentStock - originalEffect;
-        // Do not check for sufficient stock if the updated movement is an 'Ajustement'
-        if (updatedMovement.type !== 'Ajustement' && stockWithoutOriginal + updatedEffect < 0) {
-            const articleName = stock.name;
-            throw new ApiError('INSUFFICIENT_STOCK', { articleName, available: stockWithoutOriginal, required: Math.abs(updatedEffect) });
-        }
+      const stock = this.stock().find(s => s.id === updatedMovement.articleId)!;
+      const stockWithoutOriginal = stock.currentStock - originalEffect;
+      if (updatedMovement.type !== 'Ajustement' && stockWithoutOriginal + updatedEffect < 0) {
+        const articleName = stock.name;
+        throw new ApiError('INSUFFICIENT_STOCK', {
+          articleName,
+          available: stockWithoutOriginal,
+          required: Math.abs(updatedEffect)
+        });
+      }
     } else {
-        // Check new article
-        const newArticleStock = this.stock().find(s => s.id === updatedMovement.articleId)!;
-        // Do not check for sufficient stock if the updated movement is an 'Ajustement'
-        if (updatedMovement.type !== 'Ajustement' && newArticleStock.currentStock + updatedEffect < 0) {
-            const articleName = newArticleStock.name;
-            throw new ApiError('INSUFFICIENT_STOCK', { articleName, available: newArticleStock.currentStock, required: Math.abs(updatedEffect) });
-        }
-        // Check old article
-        const oldArticleStock = this.stock().find(s => s.id === originalMovement.articleId)!;
-        if (oldArticleStock.currentStock - originalEffect < 0) {
-             throw new ApiError('INSUFFICIENT_STOCK_ON_DELETE', { articleName: oldArticleStock.name });
-        }
+      // Check new article
+      const newArticleStock = this.stock().find(s => s.id === updatedMovement.articleId)!;
+      if (updatedMovement.type !== 'Ajustement' && newArticleStock.currentStock + updatedEffect < 0) {
+        const articleName = newArticleStock.name;
+        throw new ApiError('INSUFFICIENT_STOCK', {
+          articleName,
+          available: newArticleStock.currentStock,
+          required: Math.abs(updatedEffect)
+        });
+      }
+      // Check old article
+      const oldArticleStock = this.stock().find(s => s.id === originalMovement.articleId)!;
+      if (oldArticleStock.currentStock - originalEffect < 0) {
+        throw new ApiError('INSUFFICIENT_STOCK_ON_DELETE', { articleName: oldArticleStock.name });
+      }
     }
 
-    this._movements.update(movements =>
-      movements.map(m => (m.id === updatedMovement.id ? updatedMovement : m))
-    );
+    await this.firestoreService.setDocument('movements', updatedMovement.id.toString(), updatedMovement);
     return updatedMovement;
   }
 
-  deleteMovement(id: number): void {
+  async deleteMovement(id: number): Promise<void> {
     const movementToDelete = this._movements().find(m => m.id === id);
     if (!movementToDelete) return;
 
     const stockItem = this.stock().find(s => s.id === movementToDelete.articleId);
     if (stockItem) {
-        const stockAfterDelete = stockItem.currentStock - this.getStockEffect(movementToDelete);
-        if (stockAfterDelete < 0) {
-            throw new ApiError('INSUFFICIENT_STOCK_ON_DELETE', { articleName: stockItem.name });
-        }
+      const stockAfterDelete = stockItem.currentStock - this.getStockEffect(movementToDelete);
+      if (stockAfterDelete < 0) {
+        throw new ApiError('INSUFFICIENT_STOCK_ON_DELETE', { articleName: stockItem.name });
+      }
     }
-    this._movements.update(movements => movements.filter(m => m.id !== id));
+    await this.firestoreService.deleteDocument('movements', id.toString());
   }
 
-  // Users
-  authenticate(username: string, password_provided: string): User | null {
-    const user = this._users().find(u => u.username === username && u.password === password_provided);
-    return user ? { id: user.id, username: user.username, firstName: user.firstName, lastName: user.lastName, role: user.role } : null;
+  // ============ USERS ============
+
+  async addUser(user: Omit<User, 'id'>): Promise<User> {
+    const newUser: Omit<User, 'id'> = { ...user };
+    const id = await this.firestoreService.addDocument<Omit<User, 'id'>>('users', newUser);
+    return { ...newUser, id } as User;
   }
 
-  addUser(user: Omit<User, 'id'>): User {
-    const newUser: User = { ...user, id: Date.now() };
-    this._users.update(users => [...users, newUser]);
-    return newUser;
+  async updateUser(updatedUser: User): Promise<User> {
+    const existingUser = this._users().find(u => u.id === updatedUser.id);
+    if (!existingUser) {
+      throw new ApiError('USER_NOT_FOUND');
+    }
+
+    const userToSave = { ...updatedUser };
+    if (!updatedUser.password) {
+      userToSave.password = existingUser.password;
+    }
+
+    await this.firestoreService.setDocument('users', updatedUser.id.toString(), userToSave);
+    return userToSave;
   }
 
-  updateUser(updatedUser: User): User {
-    this._users.update(users =>
-      users.map(u => {
-        if (u.id === updatedUser.id) {
-          const userWithPass = { ...u, ...updatedUser };
-          if (!updatedUser.password) {
-            userWithPass.password = u.password;
-          }
-          return userWithPass;
-        }
-        return u;
-      })
-    );
-    return updatedUser;
+  async deleteUser(id: string): Promise<void> {
+    await this.firestoreService.deleteDocument('users', id);
   }
 
-  deleteUser(id: number): void {
-    this._users.update(users => users.filter(u => u.id !== id));
-  }
+  // ============ SETTINGS ============
 
-  // Settings
-  updateSettings(key: 'categories' | 'suppliers' | 'destinations' | 'outgoingSubcategories', value: string[]): { categories: string[], suppliers: string[], destinations: string[], outgoingSubcategories: string[] } {
+  async updateSettings(
+    key: 'categories' | 'units' | 'suppliers' | 'destinations' | 'outgoingSubcategories',
+    value: string[]
+  ): Promise<{ categories: string[], units: string[], suppliers: string[], destinations: string[], outgoingSubcategories: string[] }> {
     const currentSettings = this._settings();
     const originalList = currentSettings[key];
     const itemsToDelete = originalList.filter(item => !value.includes(item));
-    
+
     for (const item of itemsToDelete) {
-        if (key === 'categories' && this._articles().some(a => a.category === item)) {
-            throw new ApiError('CATEGORY_IN_USE', { item });
-        }
-        if (key === 'suppliers' && this._movements().some(m => m.supplierDest === item && m.type === 'Entrée')) {
-            throw new ApiError('SUPPLIER_IN_USE', { item });
-        }
-        if (key === 'destinations' && this._movements().some(m => m.supplierDest === item && (m.type === 'Sortie' || m.type === 'Périmé / Rebut'))) {
-            throw new ApiError('DESTINATION_IN_USE', { item });
-        }
-        if (key === 'outgoingSubcategories' && this._movements().some(m => m.subcategory === item)) {
-            throw new ApiError('SUBCATEGORY_IN_USE', { item });
-        }
+      if (key === 'categories' && this._articles().some(a => a.category === item)) {
+        throw new ApiError('CATEGORY_IN_USE', { item });
+      }
+      if (key === 'suppliers' && this._movements().some(m => m.supplierDest === item && m.type === 'Entrée')) {
+        throw new ApiError('SUPPLIER_IN_USE', { item });
+      }
+      if (key === 'destinations' && this._movements().some(m => m.supplierDest === item && (m.type === 'Sortie' || m.type === 'Périmé / Rebut'))) {
+        throw new ApiError('DESTINATION_IN_USE', { item });
+      }
+      if (key === 'outgoingSubcategories' && this._movements().some(m => m.subcategory === item)) {
+        throw new ApiError('SUBCATEGORY_IN_USE', { item });
+      }
     }
 
-    this._settings.update(settings => ({ ...settings, [key]: value }));
-    return this._settings();
+    const updatedSettings = { ...currentSettings, [key]: value };
+    await this.firestoreService.setDocument('settings', 'global', updatedSettings);
+    return updatedSettings;
+  }
+
+  // ============ AUTHENTICATION (Legacy - now handled by FirebaseAuthService) ============
+
+  authenticate(username: string, password_provided: string): User | null {
+    // This method is deprecated and should not be used
+    // Authentication is now handled by FirebaseAuthService
+    console.warn('ApiService.authenticate() is deprecated. Use FirebaseAuthService instead.');
+    return null;
   }
 }

@@ -26,16 +26,20 @@
         </div>
       </div>
 
-      @if (loginError) {
+      @if (loginError()) {
       <div class="p-3 text-sm text-red-700 bg-red-100 rounded-md">
-        {{ loginError }}
+        {{ loginError() }}
       </div>
       }
 
       <div>
-        <button type="submit" [disabled]="loginForm.invalid"
+        <button type="submit" [disabled]="loginForm.invalid || isLoading()"
           class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300">
+          @if (isLoading()) {
+          <span>Loading...</span>
+          } @else {
           {{ t().login.signIn }}
+          }
         </button>
       </div>
     </form>

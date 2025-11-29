@@ -44,7 +44,7 @@ export class SettingsComponent {
     this.settingsService.setDateFormat(format);
   }
 
-  addSetting(type: 'categories' | 'suppliers' | 'destinations' | 'outgoingSubcategories') {
+  async addSetting(type: 'categories' | 'suppliers' | 'destinations' | 'outgoingSubcategories') {
     let value = '';
     let signalToReset: any;
     let errorKeyExists = '';
@@ -82,7 +82,7 @@ export class SettingsComponent {
 
     const updatedList = [...currentList, value];
     try {
-      this.apiService.updateSettings(type, updatedList);
+      await this.apiService.updateSettings(type, updatedList);
       this.notificationService.showSuccess(this.t().common.addSuccess);
       signalToReset.set('');
     } catch (error) {
@@ -100,7 +100,7 @@ export class SettingsComponent {
 
     const updatedList = this.settings()[type].filter(item => item !== itemToDelete);
     try {
-      this.apiService.updateSettings(type, updatedList);
+      await this.apiService.updateSettings(type, updatedList);
       this.notificationService.showSuccess(this.t().common.deleteSuccess);
     } catch (error: any) {
       console.error(`Failed to delete ${type}`, error);

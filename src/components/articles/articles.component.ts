@@ -214,7 +214,7 @@ export class ArticlesComponent {
           ...this.editingArticle(),
           ...formValue
         } as Article;
-        this.apiService.updateArticle(articleData);
+        await this.apiService.updateArticle(articleData);
         this.notificationService.showSuccess(this.t().common.saveSuccess);
       } else {
         // New article logic with name check
@@ -233,7 +233,7 @@ export class ArticlesComponent {
         }
 
         const { id, createdAt, updatedAt, priceHistory, ...newArticle } = formValue as Article;
-        this.apiService.addArticle(newArticle as Omit<Article, 'id' | 'createdAt' | 'updatedAt' | 'priceHistory'>);
+        await this.apiService.addArticle(newArticle as Omit<Article, 'id' | 'createdAt' | 'updatedAt' | 'priceHistory'>);
         this.notificationService.showSuccess(this.t().common.addSuccess);
       }
       this.closeModal();
@@ -266,7 +266,7 @@ export class ArticlesComponent {
 
     if (confirmed) {
       try {
-        this.apiService.deleteArticle(article.id);
+        await this.apiService.deleteArticle(article.id);
         this.notificationService.showSuccess(this.t().common.deleteSuccess);
       } catch (error: any) {
         console.error("Failed to delete article", error);
@@ -356,14 +356,14 @@ export class ArticlesComponent {
     this.isImportModalOpen.set(true);
   }
 
-  confirmImport() {
+  async confirmImport() {
     if (this.importForm.invalid) {
       this.notificationService.showError("Please correct the errors in the import preview.");
       return;
     }
     try {
       const articlesToImport = this.importArticlesArray.value;
-      this.apiService.addArticles(articlesToImport);
+      await this.apiService.addArticles(articlesToImport);
       this.notificationService.showSuccess(`${articlesToImport.length} articles imported successfully.`);
       this.closeImportModal();
     } catch (e: any) {

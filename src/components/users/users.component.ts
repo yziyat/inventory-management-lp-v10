@@ -67,7 +67,7 @@ export class UsersComponent {
     this.editingUser.set(null);
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (this.userForm.invalid) return;
 
     try {
@@ -83,10 +83,10 @@ export class UsersComponent {
         if (formValue.password) {
           userToUpdate.password = formValue.password;
         }
-        this.apiService.updateUser(userToUpdate);
+        await this.apiService.updateUser(userToUpdate);
         this.notificationService.showSuccess(this.t().common.saveSuccess);
       } else {
-        this.apiService.addUser(formValue as Omit<User, 'id'>);
+        await this.apiService.addUser(formValue as Omit<User, 'id'>);
         this.notificationService.showSuccess(this.t().common.addSuccess);
       }
       this.closeModal();
@@ -109,7 +109,7 @@ export class UsersComponent {
 
     if (confirmed) {
       try {
-        this.apiService.deleteUser(user.id);
+        await this.apiService.deleteUser(user.id);
         this.notificationService.showSuccess(this.t().common.deleteSuccess);
       } catch (error) {
         console.error("Failed to delete user", error);

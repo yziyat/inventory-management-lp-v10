@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -25,16 +25,27 @@ export class LoginComponent {
     rememberMe: [false]
   });
 
-  loginError: string | null = null;
+  loginError = signal<string | null>(null);
+  isLoading = signal(false);
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.loginForm.valid) {
+      this.isLoading.set(true);
+      this.loginError.set(null);
+
       const { username, password, rememberMe } = this.loginForm.value;
-      const user = this.authService.login(username!, password!, rememberMe!);
-      if (user) {
-        this.router.navigate(['/stock']);
-      } else {
-        this.loginError = this.t().login.authFailed;
+
+      try {
+        const user = await this.authService.login(username!, password!, rememberMe!);
+        if (user) {
+          this.router.navigate(['/stock']);
+        } else {
+          this.loginError.set(this.t().login.authFailed);
+        }
+      } catch (error: any) {
+        this.loginError.set(error.message || this.t().login.authFailed);
+      } finally {
+        this.isLoading.set(false);
       }
     }
   }

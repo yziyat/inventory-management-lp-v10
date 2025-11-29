@@ -1,46 +1,47 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { User } from '../models/user.model';
-import { ApiService } from './api.service';
-
-const SESSION_STORAGE_KEY = 'inventory_user_session';
+import { FirebaseAuthService } from './firebase-auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiService = inject(ApiService);
-  
-  currentUser = signal<User | null>(this.getInitialUser());
+  private firebaseAuth = inject(FirebaseAuthService);
+
+  // Delegate to Firebase Auth service
+  currentUser = this.firebaseAuth.currentUser;
+  isLoading = this.firebaseAuth.isLoading;
 
   isLoggedIn = computed(() => !!this.currentUser());
   isAdmin = computed(() => this.currentUser()?.role === 'admin');
   isEditor = computed(() => this.currentUser()?.role === 'editor');
   isViewer = computed(() => this.currentUser()?.role === 'viewer');
 
-  private getInitialUser(): User | null {
+  /**
+   * Login with username (email) and password
+   * For backward compatibility, we treat username as email
+   */
+  async login(username: string, password: string, rememberMe: boolean): Promise<User | null> {
     try {
-      const savedSession = localStorage.getItem(SESSION_STORAGE_KEY);
-      return savedSession ? JSON.parse(savedSession) : null;
-    } catch (e) {
+      // Convert username to email format if it's not already
+      const email = username.includes('@') ? username : `${username}@inventory-app.local`;
+      const user = await this.firebaseAuth.signIn(email, password);
+      return user;
+    } catch (error: any) {
+      console.error('Login error:', error);
       return null;
     }
   }
 
-  login(username: string, password_provided: string, rememberMe: boolean): User | null {
-    const user = this.apiService.authenticate(username, password_provided);
-    if (user) {
-      this.currentUser.set(user);
-      if (rememberMe) {
-        localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(user));
-      } else {
-        sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(user));
-        localStorage.removeItem(SESSION_STORAGE_KEY);
-      }
-    }
-    return user;
+  /**
+   * Logout current user
+   */
+  async logout(): Promise<void> {
+    await this.firebaseAuth.signOut();
   }
 
-  logout() {
-    this.currentUser.set(null);
-    localStorage.removeItem(SESSION_STORAGE_KEY);
-    sessionStorage.removeItem(SESSION_STORAGE_KEY);
+  /**
+   * Check if user is authenticated
+   */
+  isAuthenticated(): boolean {
+    return this.firebaseAuth.isAuthenticated();
   }
 }

@@ -188,9 +188,9 @@ export class ArticleDetailComponent {
   // FIX: Add explicit type to injected FormBuilder to resolve type inference issue.
   private fb: FormBuilder = inject(FormBuilder);
   authService = inject(AuthService);
-  
+
   t = this.translationService.currentTranslations;
-  
+
   article = input<Article | null>();
   close = output<void>();
 
@@ -200,7 +200,7 @@ export class ArticleDetailComponent {
   destinations = computed(() => this.apiService.settings().destinations);
   outgoingSubcategories = computed(() => this.apiService.settings().outgoingSubcategories);
   today = new Date().toISOString().split('T')[0];
-  
+
   // Pagination for movements
   movementCurrentPage = signal(1);
   movementItemsPerPage = signal(10);
@@ -222,7 +222,7 @@ export class ArticleDetailComponent {
     const end = start + perPage;
     return movements.slice(start, end);
   });
-  
+
   movementForm = this.fb.group({
     type: ['Entrée' as Movement['type'], Validators.required],
     quantity: [1, [Validators.required, Validators.min(1)]],
@@ -246,7 +246,7 @@ export class ArticleDetailComponent {
 
   constructor() {
     this.movementForm.get('type')?.valueChanges.subscribe(type => {
-      if(type) {
+      if (type) {
         this.movementType.set(type);
       }
       this.updateFormValidators(type);
@@ -254,12 +254,12 @@ export class ArticleDetailComponent {
     });
 
     effect(() => {
-        if(this.article()){
-            this.movementCurrentPage.set(1);
-        }
+      if (this.article()) {
+        this.movementCurrentPage.set(1);
+      }
     });
   }
-  
+
   onMovementPageChange(page: number) {
     this.movementCurrentPage.set(page);
   }
@@ -272,10 +272,10 @@ export class ArticleDetailComponent {
     if (!quantityControl || !supplierDestControl || !subcategoryControl) return;
 
     if (type === 'Sortie' || type === 'Périmé / Rebut') {
-        subcategoryControl.enable();
+      subcategoryControl.enable();
     } else {
-        subcategoryControl.disable();
-        subcategoryControl.reset('');
+      subcategoryControl.disable();
+      subcategoryControl.reset('');
     }
 
     if (type === 'Ajustement') {
@@ -294,13 +294,13 @@ export class ArticleDetailComponent {
 
   openMovementModal() {
     this.movementForm.reset({
-        type: 'Entrée',
-        quantity: 1,
-        date: this.today,
-        refDoc: '',
-        supplierDest: '',
-        subcategory: '',
-        remarks: ''
+      type: 'Entrée',
+      quantity: 1,
+      date: this.today,
+      refDoc: '',
+      supplierDest: '',
+      subcategory: '',
+      remarks: ''
     });
     this.movementType.set('Entrée');
     this.updateFormValidators('Entrée');
@@ -311,30 +311,30 @@ export class ArticleDetailComponent {
     this.isMovementModalOpen.set(false);
   }
 
-  onAddMovementSubmit() {
+  async onAddMovementSubmit() {
     if (this.movementForm.invalid || !this.article()) return;
     try {
-        const formValue = this.movementForm.getRawValue();
-        const newMovement: Omit<Movement, 'id'> = {
-            articleId: this.article()!.id,
-            userId: this.authService.currentUser()!.id,
-            date: formValue.date!,
-            refDoc: formValue.refDoc!,
-            type: formValue.type!,
-            quantity: formValue.quantity!,
-            supplierDest: formValue.supplierDest!,
-            subcategory: formValue.subcategory || undefined,
-            remarks: formValue.remarks!
-        };
-        this.apiService.addMovement(newMovement);
-        this.notificationService.showSuccess(this.t().common.addSuccess);
-        this.closeMovementModal();
+      const formValue = this.movementForm.getRawValue();
+      const newMovement: Omit<Movement, 'id'> = {
+        articleId: this.article()!.id,
+        userId: this.authService.currentUser()!.id,
+        date: formValue.date!,
+        refDoc: formValue.refDoc!,
+        type: formValue.type!,
+        quantity: formValue.quantity!,
+        supplierDest: formValue.supplierDest!,
+        subcategory: formValue.subcategory || undefined,
+        remarks: formValue.remarks!
+      };
+      await this.apiService.addMovement(newMovement);
+      this.notificationService.showSuccess(this.t().common.addSuccess);
+      this.closeMovementModal();
     } catch (error: any) {
-        if (error?._isApiError && error.key === 'INSUFFICIENT_STOCK') {
-            this.notificationService.showError(this.translationService.translate('errors.insufficientStock', error.params));
-        } else {
-            this.notificationService.showError(this.translationService.translate('errors.failedToSaveMovement'));
-        }
+      if (error?._isApiError && error.key === 'INSUFFICIENT_STOCK') {
+        this.notificationService.showError(this.translationService.translate('errors.insufficientStock', error.params));
+      } else {
+        this.notificationService.showError(this.translationService.translate('errors.failedToSaveMovement'));
+      }
     }
   }
 }

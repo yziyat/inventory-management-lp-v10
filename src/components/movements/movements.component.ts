@@ -406,7 +406,7 @@ export class MovementsComponent {
     this.currentPage.set(1);
   }
 
-  onSingleSubmit() {
+  async onSingleSubmit() {
     if (this.movementForm.invalid) return;
     try {
       const formValue = this.movementForm.getRawValue();
@@ -416,7 +416,7 @@ export class MovementsComponent {
         userId: this.authService.currentUser()!.id,
       };
       const { id, ...newMovement } = movementData;
-      this.apiService.addMovement(newMovement as Omit<Movement, 'id'>);
+      await this.apiService.addMovement(newMovement as Omit<Movement, 'id'>);
       this.notificationService.showSuccess(this.t().common.addSuccess);
       this.resetMovementForm();
 
@@ -430,7 +430,7 @@ export class MovementsComponent {
     }
   }
 
-  onModalSubmit() {
+  async onModalSubmit() {
     if (this.movementForm.invalid) return;
     try {
       const formValue = this.movementForm.getRawValue();
@@ -440,7 +440,7 @@ export class MovementsComponent {
         ...formValue,
         articleId: Number(formValue.articleId),
       };
-      this.apiService.updateMovement(movementData as Movement);
+      await this.apiService.updateMovement(movementData as Movement);
       this.notificationService.showSuccess(this.t().common.saveSuccess);
       this.closeModal();
 
@@ -454,7 +454,7 @@ export class MovementsComponent {
     }
   }
 
-  onBulkSubmit() {
+  async onBulkSubmit() {
     if (this.bulkMovementsArray.hasError('duplicateDestinations')) {
       this.notificationService.showWarning(this.t().movements.bulkForm.duplicateDestination);
       return;
@@ -489,7 +489,7 @@ export class MovementsComponent {
 
     try {
       let movementsAdded = 0;
-      movements.forEach(m => {
+      for (const m of movements) {
         if (m.quantity > 0 && m.supplierDest) {
           const newMovement: Omit<Movement, 'id'> = {
             articleId: articleId,
@@ -501,10 +501,10 @@ export class MovementsComponent {
             refDoc: '',
             remarks: m.remarks
           };
-          this.apiService.addMovement(newMovement);
+          await this.apiService.addMovement(newMovement);
           movementsAdded++;
         }
-      });
+      }
       this.notificationService.showSuccess(this.translationService.translate('movements.bulkForm.success', { count: movementsAdded }));
       this.resetBulkForm();
     } catch (error) {
@@ -520,7 +520,7 @@ export class MovementsComponent {
 
     if (confirmed) {
       try {
-        this.apiService.deleteMovement(movement.id);
+        await this.apiService.deleteMovement(movement.id);
         this.notificationService.showSuccess(this.t().common.deleteSuccess);
       } catch (error: any) {
         console.error("Failed to delete movement", error);
