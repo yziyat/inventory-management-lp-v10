@@ -2,9 +2,12 @@
 <div class="lg:flex h-screen bg-gray-50">
   <!-- Sidebar -->
   <aside
-    class="fixed inset-y-0 left-0 bg-gray-900 text-white flex flex-col z-40 transform transition-all duration-300 ease-in-out lg:relative lg:translate-x-0"
+    class="inset-y-0 left-0 bg-gray-900 text-white flex flex-col z-40 transform transition-all duration-300 ease-in-out lg:translate-x-0"
+    [class.fixed]="!isSidebarPinned() && isSidebarHovered()" [class.lg:fixed]="!isSidebarPinned() && isSidebarHovered()"
+    [class.lg:relative]="isSidebarPinned() || !isSidebarHovered()" [class.fixed]="isMobileMenuOpen()"
     [class.translate-x-0]="isMobileMenuOpen()" [class.-translate-x-full]="!isMobileMenuOpen()"
-    [class.w-64]="isSidebarExpanded()" [class.w-20]="!isSidebarExpanded()" (mouseenter)="isSidebarHovered.set(true)"
+    [class.w-64]="isSidebarExpanded()" [class.w-20]="!isSidebarExpanded()"
+    [class.shadow-2xl]="!isSidebarPinned() && isSidebarHovered()" (mouseenter)="isSidebarHovered.set(true)"
     (mouseleave)="isSidebarHovered.set(false)">
 
     <!-- Header -->
@@ -68,7 +71,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" /> }
           @case ('user-group') {
           <path stroke-linecap="round" stroke-linejoin="round"
-            d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m-7.5-2.952a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-7.5 0a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm13.5 0a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-7.5 0a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" />
+            d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
           }
           @case ('cog-6-tooth') {
           <path stroke-linecap="round" stroke-linejoin="round"

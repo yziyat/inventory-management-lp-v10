@@ -93,6 +93,13 @@ export class AppComponent {
   getNavLabel(label: string): string {
     const key = label.toLowerCase().replace(' ', '');
     const nav = this.t().nav as Record<string, any>;
-    return nav[key] || label;
+    const value = nav[key] || label;
+
+    // Handle nested objects (like settings)
+    if (typeof value === 'object' && value !== null && 'title' in value) {
+      return value.title;
+    }
+
+    return value;
   }
 }
