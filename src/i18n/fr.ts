@@ -130,7 +130,7 @@ export const fr = {
       remarks: { label: 'Remarques' },
     },
     bulkForm: {
-      title: 'Saisie en Masse',
+      title: 'Saisie en masse par article',
       addRow: 'Ajouter une ligne',
       invalidForm: 'Veuillez remplir tous les champs requis dans le formulaire de saisie en masse.',
       success: '{{count}} mouvements enregistrés avec succès.',
@@ -141,7 +141,7 @@ export const fr = {
       submit: 'Valider',
     },
     fixedBulkForm: {
-      title: 'Saisie Groupée Fixe',
+      title: 'Saisie en masse par destination',
       description: 'Enregistrez plusieurs mouvements pour la même destination et date.',
       article: 'Article',
       insufficientStockTitle: 'Stock Insuffisant',

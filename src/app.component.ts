@@ -61,7 +61,13 @@ export class AppComponent {
         const key = title.replace(/\s+/g, '').toLowerCase();
         // FIX: Add an explicit type to the nav object to allow indexing by a dynamic string key.
         const navTranslations = this.t().nav as Record<string, any>;
-        const translatedTitle = navTranslations[key] || title;
+        let translatedTitle = navTranslations[key] || title;
+
+        // Handle nested objects (like settings)
+        if (typeof translatedTitle === 'object' && translatedTitle !== null && 'title' in translatedTitle) {
+          translatedTitle = translatedTitle.title;
+        }
+
         this.pageTitle.set(translatedTitle);
       }
     });

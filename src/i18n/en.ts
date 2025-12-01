@@ -130,7 +130,7 @@ export const en = {
       remarks: { label: 'Remarks' },
     },
     bulkForm: {
-      title: 'Bulk Entry',
+      title: 'Bulk Entry by Article',
       addRow: 'Add Row',
       invalidForm: 'Please fill all required fields in the bulk form.',
       success: '{{count}} movements recorded successfully.',
@@ -141,7 +141,7 @@ export const en = {
       submit: 'Submit',
     },
     fixedBulkForm: {
-      title: 'Fixed Bulk Entry',
+      title: 'Bulk Entry by Destination',
       description: 'Record multiple movements for the same destination and date.',
       article: 'Article',
       insufficientStockTitle: 'Insufficient Stock',
