@@ -134,6 +134,16 @@ export const en = {
       invalidForm: 'Please fill all required fields in the bulk form.',
       success: '{{count}} movements recorded successfully.',
       duplicateDestination: 'Each destination can only be used once in the same form.',
+      quantity: 'Quantity',
+      remarks: 'Remarks',
+      cancel: 'Cancel',
+      submit: 'Submit',
+    },
+    fixedBulkForm: {
+      title: 'Fixed Bulk Entry',
+      description: 'Record multiple movements for the same destination and date.',
+      article: 'Article',
+      insufficientStockTitle: 'Insufficient Stock',
     },
     filters: {
       startDate: 'Start Date',

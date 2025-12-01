@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { Movement, MovementType } from '../../models/movement.model';
 import { TableHeaderComponent } from '../shared/table-header.component';
@@ -143,6 +143,19 @@ export class MovementsComponent {
     const stockItem = this.stock().find(s => s.id === articleId);
     return stockItem ? { stock: stockItem.currentStock, unit: stockItem.unit } : null;
   });
+
+  articleNameMap = computed(() => {
+    const map = new Map<string, string>();
+    this.articles().forEach(a => map.set(a.id, a.name));
+    return map;
+  });
+
+  articleUnitMap = computed(() => {
+    const map = new Map<string, string>();
+    this.articles().forEach(a => map.set(a.id, a.unit));
+    return map;
+  });
+
 
 
   getSupplierOrDestinationLabel(type: MovementType): string {

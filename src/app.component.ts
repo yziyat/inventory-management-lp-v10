@@ -60,7 +60,7 @@ export class AppComponent {
       if (title) {
         const key = title.replace(/\s+/g, '').toLowerCase();
         // FIX: Add an explicit type to the nav object to allow indexing by a dynamic string key.
-        const navTranslations: { [key: string]: string } = this.t().nav;
+        const navTranslations = this.t().nav as Record<string, any>;
         const translatedTitle = navTranslations[key] || title;
         this.pageTitle.set(translatedTitle);
       }
@@ -81,7 +81,7 @@ export class AppComponent {
 
   getNavLabel(label: string): string {
     const key = label.toLowerCase().replace(' ', '');
-    const nav = this.t().nav as Record<string, string>;
+    const nav = this.t().nav as Record<string, any>;
     return nav[key] || label;
   }
 }

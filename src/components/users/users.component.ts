@@ -89,7 +89,7 @@ export class UsersComponent {
         if (formValue.password) {
           userToUpdate.password = formValue.password;
         }
-        await this.apiService.updateUser(userToUpdate);
+        await this.apiService.updateUser(userToUpdate.id, userToUpdate);
         this.notificationService.showSuccess(this.t().common.saveSuccess);
       } else {
         // When admin adds user manually, set as approved
@@ -179,7 +179,7 @@ export class UsersComponent {
         if (formValue.password) {
           userToUpdate.password = formValue.password;
         }
-        await this.apiService.updateUser(userToUpdate);
+        await this.apiService.updateUser(userToUpdate.id, userToUpdate);
         this.notificationService.showSuccess(this.t().common.saveSuccess);
       } else {
         // When admin adds user manually, set as approved

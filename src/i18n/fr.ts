@@ -134,6 +134,16 @@ export const fr = {
       invalidForm: 'Veuillez remplir tous les champs requis dans le formulaire de saisie en masse.',
       success: '{{count}} mouvements enregistrés avec succès.',
       duplicateDestination: 'Chaque destination ne peut être utilisée qu\'une seule fois dans le même formulaire.',
+      quantity: 'Quantité',
+      remarks: 'Remarques',
+      cancel: 'Annuler',
+      submit: 'Valider',
+    },
+    fixedBulkForm: {
+      title: 'Saisie Groupée Fixe',
+      description: 'Enregistrez plusieurs mouvements pour la même destination et date.',
+      article: 'Article',
+      insufficientStockTitle: 'Stock Insuffisant',
     },
     filters: {
       startDate: 'Date de début',

@@ -6,6 +6,7 @@ import { Language, DateFormat } from '../../models/user.model';
 import { ApiError } from '../../services/api-error';
 import { ConfirmationService } from '../../services/confirmation.service';
 import { NotificationService } from '../../services/notification.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-settings',
@@ -20,11 +21,12 @@ export class SettingsComponent {
   private settingsService = inject(SettingsService);
   private confirmationService = inject(ConfirmationService);
   private notificationService = inject(NotificationService);
+  private authService = inject(AuthService); // Inject AuthService
 
   t = this.translationService.currentTranslations;
   currentLang = this.settingsService.language;
   currentDateFormat = this.settingsService.dateFormat;
-  currentUser = this.apiService.currentUser;
+  currentUser = this.authService.currentUser; // Use AuthService
 
   // Only admins can edit global settings
   canEditGlobalSettings = computed(() => this.currentUser()?.role === 'admin');

@@ -48,6 +48,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
   private documentClickListener!: () => void;
 
   t = this.translationService.currentTranslations;
+  objectKeys = Object.keys;
 
   articles = this.apiService.articles;
   rawReportData = signal<DetailedReportRow[] | null>(null);
