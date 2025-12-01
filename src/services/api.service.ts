@@ -1,12 +1,13 @@
 import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { Article, PriceHistory } from '../models/article.model';
 import { Movement, MovementType } from '../models/movement.model';
-import { User, UserRole } from '../models/user.model';
+import { User, UserRole, Language, DateFormat } from '../models/user.model';
 import { StockItem } from '../models/stock-item.model';
 import { ApiError } from './api-error';
 import { FirestoreService } from './firestore.service';
 import { FirebaseAuthService } from './firebase-auth.service';
 import { Unsubscribe } from '@angular/fire/firestore';
+
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -155,14 +156,14 @@ export class ApiService {
   async addArticles(articles: Omit<Article, 'id' | 'createdAt' | 'updatedAt' | 'priceHistory'>[]): Promise<Article[]> {
     const existingArticles = this._articles();
     const existingCodes = new Set(existingArticles.map(a => a.code.toLowerCase()));
-    const existingNameUnitsNormalized = new Set(existingArticles.map(a => `${this.normalizeString(a.name)}|${a.unit}`));
+    const existingNameUnitsNormalized = new Set(existingArticles.map(a => `${this.normalizeString(a.name)}| ${a.unit} `));
 
     const importCodes = new Set<string>();
     const importNameUnits = new Set<string>();
 
     for (const article of articles) {
       const lowerCode = article.code.toLowerCase();
-      const normNameUnit = `${this.normalizeString(article.name)}|${article.unit}`;
+      const normNameUnit = `${this.normalizeString(article.name)}| ${article.unit} `;
 
       if (existingCodes.has(lowerCode) || importCodes.has(lowerCode)) {
         throw new ApiError('ARTICLE_CODE_EXISTS');
@@ -235,16 +236,18 @@ export class ApiService {
   private generateMovementId(): string {
     const now = new Date();
     const pad = (num: number) => num.toString().padStart(2, '0');
+    const padMs = (num: number) => num.toString().padStart(3, '0');
 
-    const day = pad(now.getDate());
+    const year = now.getFullYear();
     const month = pad(now.getMonth() + 1);
-    const year = now.getFullYear().toString().slice(-2);
+    const day = pad(now.getDate());
     const hours = pad(now.getHours());
     const minutes = pad(now.getMinutes());
     const seconds = pad(now.getSeconds());
+    const ms = padMs(now.getMilliseconds());
 
-    // DDMMYYHHMMSS
-    return `${day}${month}${year}${hours}${minutes}${seconds}`;
+    // YYYYMMDDHHmmssSSS (Sortable and unique enough for bulk operations)
+    return `${year}${month}${day}${hours}${minutes}${seconds}${ms}`;
   }
 
   async addMovement(movement: Omit<Movement, 'id'>): Promise<Movement> {
@@ -333,19 +336,26 @@ export class ApiService {
     return { ...newUser, id } as User;
   }
 
-  async updateUser(updatedUser: User): Promise<User> {
-    const existingUser = this._users().find(u => u.id === updatedUser.id);
-    if (!existingUser) {
-      throw new ApiError('USER_NOT_FOUND');
-    }
+  async updateUser(id: string, updates: Partial<User>): Promise<void> {
+    const users = this._users();
+    const index = users.findIndex(u => u.id === id);
+    if (index === -1) throw new ApiError('USER_NOT_FOUND');
 
-    const userToSave = { ...updatedUser };
-    if (!updatedUser.password) {
-      userToSave.password = existingUser.password;
-    }
+    const updatedUser = { ...users[index], ...updates };
+    await this.firestoreService.updateDocument('users', id, updatedUser);
+    this._users.update(current => {
+      const updated = [...current];
+      updated[index] = updatedUser;
+      return updated;
+    });
+  }
 
-    await this.firestoreService.setDocument('users', updatedUser.id.toString(), userToSave);
-    return userToSave;
+  async updateUserPreferences(userId: string, language?: Language, dateFormat?: DateFormat): Promise<void> {
+    const updates: Partial<User> = {};
+    if (language) updates.language = language;
+    if (dateFormat) updates.dateFormat = dateFormat;
+
+    await this.updateUser(userId, updates);
   }
 
   async deleteUser(id: string): Promise<void> {

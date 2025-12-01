@@ -119,7 +119,19 @@ export class MovementsComponent {
     articleId: [null as string | null, Validators.required],
     date: [this.today, Validators.required],
     type: ['Sortie' as Movement['type'], Validators.required],
-    movements: this.fb.array([], [Validators.required, this.uniqueDestinationsValidator]),
+    movements: this.fb.array(
+      [this.createBulkMovementRow()],
+      this.uniqueDestinationsValidator.bind(this)
+    )
+  });
+
+  // Fixed Bulk Movement Form (destination and date fixed)
+  fixedBulkMovementForm = this.fb.group({
+    type: ['Sortie' as MovementType, Validators.required],
+    date: [this.today, Validators.required],
+    supplierDest: ['', Validators.required],
+    refDoc: [''],
+    movements: this.fb.array([this.createFixedBulkMovementRow()])
   });
 
   bulkMovementType = signal<MovementType>(this.bulkMovementForm.get('type')!.value!);
@@ -133,8 +145,53 @@ export class MovementsComponent {
   });
 
 
+  getSupplierOrDestinationLabel(type: MovementType): string {
+    return type === 'Entrée' ? this.t().movements.form.supplier.label : this.t().movements.form.destination.label;
+  }
+
+  getSupplierOrDestinationPlaceholder(type: MovementType): string {
+    return type === 'Entrée' ? this.t().movements.form.supplier.placeholder : this.t().movements.form.destination.placeholder;
+  }
+
+  getSupplierOrDestinationList(control: AbstractControl | null): string[] {
+    if (!control) return [];
+    const type = control.value as MovementType;
+    return type === 'Entrée' ? this.suppliers() : this.destinations();
+  }
+
+  getArticleNameById(id: string | null): string {
+    if (!id) return '';
+    return this.articleNameMap().get(id) || '';
+  }
+
+  getArticleUnitById(id: string | null): string {
+    if (!id) return '';
+    return this.articleUnitMap().get(id) || '';
+  }
+
+  // Helper methods for bulk movement forms
+  createBulkMovementRow(): FormGroup {
+    return this.fb.group({
+      supplierDest: ['', Validators.required],
+      quantity: [1, [Validators.required, Validators.min(1)]],
+      remarks: ['']
+    });
+  }
+
+  createFixedBulkMovementRow(): FormGroup {
+    return this.fb.group({
+      articleId: [null as string | null, Validators.required],
+      quantity: [1, [Validators.required, Validators.min(1)]],
+      remarks: ['']
+    });
+  }
+
   get bulkMovementsArray() {
     return this.bulkMovementForm.get('movements') as FormArray;
+  }
+
+  get fixedBulkMovementsArray() {
+    return this.fixedBulkMovementForm.get('movements') as FormArray;
   }
 
   supplierDestinationsList = computed(() => {
@@ -353,16 +410,23 @@ export class MovementsComponent {
   }
 
   addBulkMovementRow() {
-    const movementGroup = this.fb.group({
-      quantity: [1, [Validators.required, Validators.min(1)]],
-      supplierDest: ['', Validators.required],
-      remarks: ['']
-    });
-    this.bulkMovementsArray.push(movementGroup);
+    this.bulkMovementsArray.push(this.createBulkMovementRow());
   }
 
   removeBulkMovementRow(index: number) {
-    this.bulkMovementsArray.removeAt(index);
+    if (this.bulkMovementsArray.length > 1) {
+      this.bulkMovementsArray.removeAt(index);
+    }
+  }
+
+  addFixedBulkMovementRow() {
+    this.fixedBulkMovementsArray.push(this.createFixedBulkMovementRow());
+  }
+
+  removeFixedBulkMovementRow(index: number) {
+    if (this.fixedBulkMovementsArray.length > 1) {
+      this.fixedBulkMovementsArray.removeAt(index);
+    }
   }
 
   private resetMovementForm() {
@@ -393,6 +457,18 @@ export class MovementsComponent {
     this.bulkFormArticleId.set(null);
     this.bulkMovementsArray.clear();
     this.addBulkMovementRow();
+  }
+
+  private resetFixedBulkForm() {
+    this.fixedBulkMovementForm.reset({
+      type: 'Sortie',
+      date: this.today,
+      supplierDest: '',
+      refDoc: '',
+      movements: []
+    });
+    this.fixedBulkMovementsArray.clear();
+    this.addFixedBulkMovementRow();
   }
 
   handleSort(key: string) {
@@ -512,6 +588,80 @@ export class MovementsComponent {
       this.resetBulkForm();
     } catch (error) {
       this.notificationService.showError(this.translationService.translate('errors.failedToSaveMovement'));
+    }
+  }
+
+  async onFixedBulkSubmit() {
+    if (this.fixedBulkMovementForm.invalid) {
+      this.notificationService.showWarning(this.t().movements.bulkForm.invalidForm);
+      return;
+    }
+
+    const formValue = this.fixedBulkMovementForm.getRawValue();
+    const movements = (formValue.movements || []) as Array<{ articleId: string | null, quantity: number, remarks?: string }>;
+
+    // Filter valid movements
+    const validMovements = movements.filter(m => m.articleId && m.quantity > 0);
+
+    if (validMovements.length === 0) {
+      this.notificationService.showWarning(this.t().movements.bulkForm.invalidForm);
+      return;
+    }
+
+    // STRICT VALIDATION: Check stock for ALL articles BEFORE saving ANY
+    if (formValue.type !== 'Entrée') {
+      const stockErrors: string[] = [];
+
+      for (const m of validMovements) {
+        const article = this.articles().find(a => a.id === m.articleId);
+        if (!article) continue;
+
+        const stockItem = this.apiService.stock().find(s => s.id === m.articleId);
+        const currentStock = stockItem?.currentStock || 0;
+
+        if (currentStock < m.quantity) {
+          stockErrors.push(`${article.name}: ${this.t().movements.form.inStock} ${currentStock}, requis ${m.quantity}`);
+        }
+      }
+
+      // If ANY article has insufficient stock, BLOCK ALL
+      if (stockErrors.length > 0) {
+        this.notificationService.showError(
+          (this.t().movements.fixedBulkForm?.insufficientStockTitle || 'Stock insuffisant') + ':\n' + stockErrors.join('\n')
+        );
+        return;
+      }
+    }
+
+    // All validations passed, save all movements
+    try {
+      let movementsAdded = 0;
+
+      for (const m of validMovements) {
+        const newMovement: Omit<Movement, 'id'> = {
+          articleId: m.articleId!,
+          userId: this.authService.currentUser()!.id,
+          date: formValue.date!,
+          type: formValue.type!,
+          quantity: m.quantity,
+          supplierDest: formValue.supplierDest!,
+          refDoc: formValue.refDoc || '',
+          remarks: m.remarks || ''
+        };
+
+        await this.apiService.addMovement(newMovement);
+        movementsAdded++;
+      }
+
+      this.notificationService.showSuccess(
+        this.translationService.translate('movements.fixedBulkForm.success', { count: movementsAdded }) ||
+        `${movementsAdded} mouvements ajoutés avec succès`
+      );
+      this.resetFixedBulkForm();
+      this.isFixedBulkFormVisible.set(false);
+    } catch (error) {
+      console.error('Error adding fixed bulk movements:', error);
+      this.notificationService.showError(this.t().common.error);
     }
   }
 

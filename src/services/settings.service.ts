@@ -1,7 +1,5 @@
-import { Injectable, signal } from '@angular/core';
-
-export type Language = 'en' | 'fr';
-export type DateFormat = 'YYYY-MM-DD' | 'DD/MM/YYYY';
+import { Injectable, signal, effect } from '@angular/core';
+import { Language, DateFormat } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class SettingsService {
@@ -26,5 +24,15 @@ export class SettingsService {
   setDateFormat(format: DateFormat) {
     this.dateFormat.set(format);
     localStorage.setItem('appDateFormat', format);
+  }
+
+  // Load user-specific preferences or fallback to global settings
+  loadUserPreferences(userLanguage?: Language, userDateFormat?: DateFormat) {
+    if (userLanguage) {
+      this.language.set(userLanguage);
+    }
+    if (userDateFormat) {
+      this.dateFormat.set(userDateFormat);
+    }
   }
 }

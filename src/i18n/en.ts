@@ -23,7 +23,18 @@ export const en = {
     movements: 'Movements',
     reports: 'Reports',
     users: 'Users',
-    settings: 'Settings',
+    settings: {
+      title: 'Settings',
+      display: {
+        title: 'Display',
+      },
+      personalPreferences: {
+        title: 'Personal Preferences',
+        description: 'Customize your user experience. These settings are saved with your account.',
+        languageHint: 'Choose your preferred language',
+        dateFormatHint: 'Choose your preferred date format',
+      },
+    },
   },
   login: {
     title: 'Welcome!',
@@ -193,6 +204,8 @@ export const en = {
       initialStock: 'Initial Stock',
       totalIn: 'Total In',
       totalOut: 'Total Out',
+      totalExpired: 'Expired / Discarded',
+      totalAdjustment: 'Adjustment',
       finalStock: 'Final Stock',
     },
     filter: {
@@ -327,7 +340,27 @@ export const en = {
       article: 'Article',
       supplier: 'Supplier',
       destination: 'Destination',
-      allArticles: 'All Articles',
+      bulkForm: {
+        title: 'Bulk Entry',
+        invalidForm: 'Please fill in all required fields',
+        duplicateDestination: 'Destinations must be unique',
+        success: 'Movements added successfully',
+        addRow: 'Add Row',
+        removeRow: 'Remove',
+        destination: 'Destination',
+        quantity: 'Quantity',
+        remarks: 'Remarks',
+        noRows: 'No rows added',
+        submit: 'Save all movements',
+        cancel: 'Cancel'
+      },
+      fixedBulkForm: {
+        title: 'Bulk Entry (Fixed Destination)',
+        description: 'Enter multiple articles to the same destination',
+        insufficientStockTitle: 'Insufficient stock for the following articles',
+        success: '{{count}} movements added successfully',
+        article: 'Article',
+      }, allArticles: 'All Articles',
       allSuppliers: 'All Suppliers',
       allDestinations: 'All Destinations',
       noMovements: 'No movements found.',

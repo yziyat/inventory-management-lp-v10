@@ -23,7 +23,18 @@ export const fr = {
     movements: 'Mouvements',
     reports: 'Rapports',
     users: 'Utilisateurs',
-    settings: 'Paramètres',
+    settings: {
+      title: 'Paramètres',
+      display: {
+        title: 'Affichage',
+      },
+      personalPreferences: {
+        title: 'Préférences Personnelles',
+        description: 'Personnalisez votre expérience utilisateur. Ces paramètres sont sauvegardés avec votre compte.',
+        languageHint: 'Choisissez votre langue préférée',
+        dateFormatHint: 'Choisissez votre format de date préféré',
+      },
+    },
   },
   login: {
     title: 'Bienvenue !',
@@ -193,6 +204,8 @@ export const fr = {
       initialStock: 'Stock Initial',
       totalIn: 'Total Entrées',
       totalOut: 'Total Sorties',
+      totalExpired: 'Périmé / Rebut',
+      totalAdjustment: 'Ajustement',
       finalStock: 'Stock Final',
     },
     filter: {
@@ -327,6 +340,27 @@ export const fr = {
       article: 'Article',
       supplier: 'Fournisseur',
       destination: 'Destination',
+      bulkForm: {
+        title: 'Saisie en Masse',
+        invalidForm: 'Veuillez remplir tous les champs requis',
+        duplicateDestination: 'Les destinations doivent être uniques',
+        success: 'Mouvements ajoutés avec succès',
+        addRow: 'Ajouter une ligne',
+        removeRow: 'Supprimer',
+        destination: 'Destination',
+        quantity: 'Quantité',
+        remarks: 'Remarques',
+        noRows: 'Aucune ligne ajoutée',
+        submit: 'Enregistrer tous les mouvements',
+        cancel: 'Annuler'
+      },
+      fixedBulkForm: {
+        title: 'Saisie en Masse (Destination Fixe)',
+        description: 'Saisissez plusieurs articles vers une même destination',
+        insufficientStockTitle: 'Stock insuffisant pour les articles suivants',
+        success: '{{count}} mouvements ajoutés avec succès',
+        article: 'Article',
+      },
       allArticles: 'Tous les articles',
       allSuppliers: 'Tous les fournisseurs',
       allDestinations: 'Toutes les destinations',

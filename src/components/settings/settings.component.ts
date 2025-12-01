@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { TranslationService } from '../../services/translation.service';
-import { SettingsService, Language, DateFormat } from '../../services/settings.service';
+import { SettingsService } from '../../services/settings.service';
+import { Language, DateFormat } from '../../models/user.model';
 import { ApiError } from '../../services/api-error';
 import { ConfirmationService } from '../../services/confirmation.service';
 import { NotificationService } from '../../services/notification.service';
@@ -23,6 +24,10 @@ export class SettingsComponent {
   t = this.translationService.currentTranslations;
   currentLang = this.settingsService.language;
   currentDateFormat = this.settingsService.dateFormat;
+  currentUser = this.apiService.currentUser;
+
+  // Only admins can edit global settings
+  canEditGlobalSettings = computed(() => this.currentUser()?.role === 'admin');
 
   dateFormats: DateFormat[] = ['YYYY-MM-DD', 'DD/MM/YYYY'];
   settings = this.apiService.settings;
@@ -42,6 +47,32 @@ export class SettingsComponent {
 
   setDateFormat(format: DateFormat) {
     this.settingsService.setDateFormat(format);
+  }
+
+  async updateUserLanguage(lang: Language) {
+    const currentUser = this.apiService.currentUser();
+    if (!currentUser) return;
+
+    try {
+      await this.apiService.updateUserPreferences(currentUser.id, lang, undefined);
+      this.settingsService.setLanguage(lang);
+      this.notificationService.showSuccess(this.translationService.translate('common.saveSuccess'));
+    } catch (error) {
+      this.notificationService.showError(this.translationService.translate('errors.failedToSaveUser'));
+    }
+  }
+
+  async updateUserDateFormat(format: DateFormat) {
+    const currentUser = this.apiService.currentUser();
+    if (!currentUser) return;
+
+    try {
+      await this.apiService.updateUserPreferences(currentUser.id, undefined, format);
+      this.settingsService.setDateFormat(format);
+      this.notificationService.showSuccess(this.translationService.translate('common.saveSuccess'));
+    } catch (error) {
+      this.notificationService.showError(this.translationService.translate('errors.failedToSaveUser'));
+    }
   }
 
   async addSetting(type: 'categories' | 'suppliers' | 'destinations' | 'outgoingSubcategories') {

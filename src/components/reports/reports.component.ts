@@ -16,6 +16,8 @@ interface DetailedReportRow {
   stockInitial: number;
   totalIn: number;
   totalOut: number;
+  totalExpired: number;
+  totalAdjustment: number;
   stockFinal: number;
   destinations: { [key: string]: number };
 }
@@ -250,12 +252,24 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
       const movementsInPeriod = articleMovements.filter(m => m.date >= startDate! && m.date <= endDate!);
 
+      // Entrées uniquement (pas d'ajustement)
       const totalIn = movementsInPeriod
-        .filter(m => m.type === 'Entrée' || m.type === 'Ajustement')
+        .filter(m => m.type === 'Entrée')
         .reduce((sum, m) => sum + m.quantity, 0);
 
+      // Sorties uniquement (sans périmé)
       const totalOut = movementsInPeriod
-        .filter(m => m.type === 'Sortie' || m.type === 'Périmé / Rebut')
+        .filter(m => m.type === 'Sortie')
+        .reduce((sum, m) => sum + m.quantity, 0);
+
+      // Périmé / Rebut
+      const totalExpired = movementsInPeriod
+        .filter(m => m.type === 'Périmé / Rebut')
+        .reduce((sum, m) => sum + m.quantity, 0);
+
+      // Ajustements (peuvent être positifs ou négatifs)
+      const totalAdjustment = movementsInPeriod
+        .filter(m => m.type === 'Ajustement')
         .reduce((sum, m) => sum + m.quantity, 0);
 
       const destinationBreakdown: { [key: string]: number } = {};
@@ -265,7 +279,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
           .reduce((sum, m) => sum + m.quantity, 0);
       });
 
-      const stockFinal = stockInitial + totalIn - totalOut;
+      // Formule correcte: Stock initial + Entrée - Périmé - Sorties + Ajustement
+      const stockFinal = stockInitial + totalIn - totalExpired - totalOut + totalAdjustment;
 
       return {
         articleId: article.id,
@@ -274,6 +289,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
         stockInitial,
         totalIn,
         totalOut,
+        totalExpired,
+        totalAdjustment,
         stockFinal,
         destinations: destinationBreakdown,
       };
@@ -319,11 +336,13 @@ export class ReportsComponent implements OnInit, OnDestroy {
         [t.reports.table.code]: row.articleCode,
         [t.reports.table.initialStock]: row.stockInitial,
         [t.reports.table.totalIn]: row.totalIn,
+        [t.reports.table.totalOut]: row.totalOut,
+        [t.reports.table.totalExpired]: row.totalExpired,
       };
       destinations.forEach(dest => {
         exportedRow[dest] = row.destinations[dest] || 0;
       });
-      exportedRow[t.reports.table.totalOut] = row.totalOut;
+      exportedRow[t.reports.table.totalAdjustment] = row.totalAdjustment;
       exportedRow[t.reports.table.finalStock] = row.stockFinal;
       return exportedRow;
     });

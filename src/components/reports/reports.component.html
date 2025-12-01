@@ -51,7 +51,73 @@
     </div>
   </div>
 
-  <div class="overflow-x-auto bg-white rounded-xl shadow-md">
+  <!-- Mobile Card View -->
+  <div class="md:hidden space-y-4">
+    @if (displayReportData(); as data) {
+    @if (data.length > 0) {
+    @for (row of data; track row.articleId) {
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-3">
+      <div class="flex justify-between items-start">
+        <div>
+          <h3 class="font-bold text-gray-900 text-lg">{{ row.articleName }}</h3>
+          <p class="text-sm text-gray-500">{{ row.articleCode }}</p>
+        </div>
+        <div class="text-right">
+          <div class="text-xs text-gray-500 uppercase font-semibold">{{ t().reports.table.finalStock }}</div>
+          <div class="text-xl font-bold text-indigo-700">{{ row.stockFinal }}</div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg text-sm">
+        <span class="text-gray-600">{{ t().reports.table.initialStock }}:</span>
+        <span class="font-semibold text-gray-900">{{ row.stockInitial }}</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 text-sm">
+        <div class="bg-green-50 p-2 rounded border border-green-100">
+          <div class="text-xs text-green-800 uppercase font-bold">{{ t().reports.table.totalIn }}</div>
+          <div class="font-bold text-green-700 text-lg">{{ row.totalIn }}</div>
+        </div>
+        <div class="bg-red-50 p-2 rounded border border-red-100">
+          <div class="text-xs text-red-800 uppercase font-bold">{{ t().reports.table.totalOut }}</div>
+          <div class="font-bold text-red-700 text-lg">{{ row.totalOut }}</div>
+        </div>
+        <div class="bg-gray-50 p-2 rounded border border-gray-200">
+          <div class="text-xs text-gray-600 uppercase font-bold">{{ t().reports.table.totalExpired }}</div>
+          <div class="font-bold text-gray-700 text-lg">{{ row.totalExpired }}</div>
+        </div>
+        <div class="bg-amber-50 p-2 rounded border border-amber-100">
+          <div class="text-xs text-amber-800 uppercase font-bold">{{ t().reports.table.totalAdjustment }}</div>
+          <div class="font-bold text-amber-700 text-lg">
+            {{ row.totalAdjustment > 0 ? '+' + row.totalAdjustment : row.totalAdjustment }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Destinations Breakdown (Simple list for mobile) -->
+      @if (objectKeys(row.destinations).length > 0) {
+      <div class="pt-2 border-t border-gray-100">
+        <div class="text-xs text-gray-500 uppercase font-semibold mb-1">Destinations</div>
+        <div class="space-y-1">
+          @for (dest of objectKeys(row.destinations); track dest) {
+          @if (row.destinations[dest] > 0) {
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">{{ dest }}</span>
+            <span class="font-medium text-red-600">-{{ row.destinations[dest] }}</span>
+          </div>
+          }
+          }
+        </div>
+      </div>
+      }
+    </div>
+    }
+    }
+    }
+  </div>
+
+  <!-- Desktop Table View -->
+  <div class="hidden md:block overflow-hidden bg-white rounded-xl shadow-md border border-gray-200">
     @if (displayReportData(); as data) {
     @if (data.length > 0) {
     <table class="w-full text-sm text-left text-slate-500 whitespace-nowrap">
@@ -178,10 +244,12 @@
             </div>
           </th>
           <th scope="col" class="px-3 py-3 text-center bg-green-800">{{ t().reports.table.totalIn }}</th>
+          <th scope="col" class="px-3 py-3 text-center bg-red-700">{{ t().reports.table.totalOut }}</th>
+          <th scope="col" class="px-3 py-3 text-center bg-gray-700">{{ t().reports.table.totalExpired }}</th>
           @for(dest of reportDestinations(); track dest) {
           <th scope="col" class="px-3 py-3 text-center bg-red-800">{{ dest }}</th>
           }
-          <th scope="col" class="px-3 py-3 text-center bg-red-900">{{ t().reports.table.totalOut }}</th>
+          <th scope="col" class="px-3 py-3 text-center bg-amber-700">{{ t().reports.table.totalAdjustment }}</th>
           <th scope="col" class="px-3 py-3 text-center">
             <div class="relative flex items-center justify-center gap-1" #filterContainer>
               <span>{{ t().reports.table.finalStock }}</span>
@@ -238,6 +306,8 @@
             <span>{{ row.totalIn }}</span>
             }
           </td>
+          <td class="px-3 py-3 text-center text-red-600 bg-red-50 font-semibold">{{ row.totalOut }}</td>
+          <td class="px-3 py-3 text-center text-gray-700 bg-gray-100 font-semibold">{{ row.totalExpired }}</td>
           @for(dest of reportDestinations(); track dest) {
           <td class="px-3 py-3 text-center text-red-600 bg-red-50">
             @if (row.destinations[dest] > 0) {
@@ -248,7 +318,11 @@
             }
           </td>
           }
-          <td class="px-3 py-3 text-center font-bold text-red-700 bg-red-100">{{ row.totalOut }}</td>
+          <td class="px-3 py-3 text-center font-semibold" [class.text-green-700]="row.totalAdjustment > 0"
+            [class.bg-green-50]="row.totalAdjustment > 0" [class.text-red-700]="row.totalAdjustment < 0"
+            [class.bg-red-50]="row.totalAdjustment < 0" [class.text-gray-600]="row.totalAdjustment === 0">
+            {{ row.totalAdjustment > 0 ? '+' + row.totalAdjustment : row.totalAdjustment }}
+          </td>
           <td class="px-3 py-3 text-center font-bold text-indigo-700">{{ row.stockFinal }}</td>
         </tr>
         }

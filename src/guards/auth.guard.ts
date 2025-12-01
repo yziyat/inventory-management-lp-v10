@@ -1,16 +1,23 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn, Router, UrlTree } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { filter, map, take } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = (route, state): Observable<boolean | UrlTree> => {
   const authService = inject(AuthService);
-  // FIX: Add explicit type to injected Router.
-  const router: Router = inject(Router);
+  const router = inject(Router);
 
-  if (authService.isLoggedIn()) {
-    return true;
-  } else {
-    router.navigate(['/login']);
-    return false;
-  }
+  return toObservable(authService.isLoading).pipe(
+    filter(isLoading => !isLoading),
+    take(1),
+    map(() => {
+      if (authService.isLoggedIn()) {
+        return true;
+      } else {
+        return router.createUrlTree(['/login']);
+      }
+    })
+  );
 };
