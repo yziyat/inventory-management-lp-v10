@@ -52,7 +52,7 @@ export class SettingsComponent {
   }
 
   async updateUserLanguage(lang: Language) {
-    const currentUser = this.apiService.currentUser();
+    const currentUser = this.authService.currentUser();
     if (!currentUser) return;
 
     try {
@@ -65,7 +65,7 @@ export class SettingsComponent {
   }
 
   async updateUserDateFormat(format: DateFormat) {
-    const currentUser = this.apiService.currentUser();
+    const currentUser = this.authService.currentUser();
     if (!currentUser) return;
 
     try {

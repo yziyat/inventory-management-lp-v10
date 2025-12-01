@@ -16,6 +16,7 @@ export const fr = {
     addSuccess: 'Élément ajouté avec succès.',
     saveSuccess: 'Modifications enregistrées avec succès.',
     deleteSuccess: 'Élément supprimé avec succès.',
+    error: 'Une erreur est survenue. Veuillez réessayer.',
   },
   nav: {
     stock: 'Stock',
@@ -277,7 +278,13 @@ export const fr = {
     title: 'Paramètres de l\'Application',
     deleteConfirmation: 'Êtes-vous sûr de vouloir supprimer "{{item}}"?',
     display: {
-      title: 'Paramètres d\'Affichage'
+      title: 'Paramètres d\'Affichage',
+    },
+    personalPreferences: {
+      title: 'Préférences Personnelles',
+      description: 'Personnalisez votre expérience utilisateur. Ces paramètres sont sauvegardés avec votre compte.',
+      languageHint: 'Choisissez votre langue préférée',
+      dateFormatHint: 'Choisissez votre format de date préféré',
     },
     language: {
       title: 'Langue',

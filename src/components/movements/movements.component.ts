@@ -144,11 +144,7 @@ export class MovementsComponent {
     return stockItem ? { stock: stockItem.currentStock, unit: stockItem.unit } : null;
   });
 
-  articleNameMap = computed(() => {
-    const map = new Map<string, string>();
-    this.articles().forEach(a => map.set(a.id, a.name));
-    return map;
-  });
+
 
   articleUnitMap = computed(() => {
     const map = new Map<string, string>();

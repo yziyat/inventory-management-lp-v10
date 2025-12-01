@@ -16,6 +16,7 @@ export const en = {
     addSuccess: 'Item added successfully.',
     saveSuccess: 'Changes saved successfully.',
     deleteSuccess: 'Item deleted successfully.',
+    error: 'An error occurred. Please try again.',
   },
   nav: {
     stock: 'Stock',
@@ -277,7 +278,13 @@ export const en = {
     title: 'Application Settings',
     deleteConfirmation: 'Are you sure you want to delete "{{item}}"?',
     display: {
-      title: 'Display Settings'
+      title: 'Display Settings',
+    },
+    personalPreferences: {
+      title: 'Personal Preferences',
+      description: 'Customize your user experience. These settings are saved with your account.',
+      languageHint: 'Choose your preferred language',
+      dateFormatHint: 'Choose your preferred date format',
     },
     language: {
       title: 'Language',
