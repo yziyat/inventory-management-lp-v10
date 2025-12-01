@@ -35,6 +35,7 @@ export class StockComponent {
   // KPIs
   totalArticles = computed(() => this.apiService.articles().length);
   lowStockItems = computed(() => this.stock().filter(item => item.currentStock <= item.alert && item.alert > 0).length);
+  outOfStockItems = computed(() => this.stock().filter(item => item.currentStock === 0).length);
   totalStockValue = computed(() => this.stock().reduce((acc, item) => acc + (item.currentStock * item.price), 0));
 
   formattedTotalStockValue = computed(() => {

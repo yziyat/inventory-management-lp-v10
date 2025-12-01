@@ -59,6 +59,7 @@ export class MovementsComponent {
   // Form visibility
   isSingleFormVisible = signal(false);
   isBulkFormVisible = signal(false);
+  isFixedBulkFormVisible = signal(false);
 
   // Sorting
   sortKey = signal('id');

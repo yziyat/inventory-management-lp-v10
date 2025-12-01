@@ -149,6 +149,7 @@ export const en = {
     kpi: {
       totalArticles: 'Total Articles',
       lowStockItems: 'Low Stock Items',
+      outOfStockItems: 'Out of Stock Items',
       stockValue: 'Stock Value',
     },
     pagination: {
