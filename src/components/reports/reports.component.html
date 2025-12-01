@@ -243,14 +243,18 @@
               }
             </div>
           </th>
-          <th scope="col" class="px-3 py-3 text-center bg-green-800">{{ t().reports.table.totalIn }}</th>
-          <th scope="col" class="px-3 py-3 text-center bg-red-700">{{ t().reports.table.totalOut }}</th>
-          <th scope="col" class="px-3 py-3 text-center bg-gray-700">{{ t().reports.table.totalExpired }}</th>
+          <th scope="col" class="px-3 py-3 text-center bg-green-800 whitespace-normal break-words">{{
+            t().reports.table.totalIn }}</th>
+          <th scope="col" class="px-3 py-3 text-center bg-red-700 whitespace-normal break-words">{{
+            t().reports.table.totalOut }}</th>
+          <th scope="col" class="px-3 py-3 text-center bg-gray-700 whitespace-normal break-words">{{
+            t().reports.table.totalExpired }}</th>
           @for(dest of reportDestinations(); track dest) {
-          <th scope="col" class="px-3 py-3 text-center bg-red-800">{{ dest }}</th>
+          <th scope="col" class="px-3 py-3 text-center bg-red-800 whitespace-normal break-words">{{ dest }}</th>
           }
-          <th scope="col" class="px-3 py-3 text-center bg-amber-700">{{ t().reports.table.totalAdjustment }}</th>
-          <th scope="col" class="px-3 py-3 text-center">
+          <th scope="col" class="px-3 py-3 text-center bg-amber-600 whitespace-normal break-words">{{
+            t().reports.table.totalAdjustment }}</th>
+          <th scope="col" class="px-3 py-3 text-center bg-indigo-900 rounded-tr-lg whitespace-normal break-words">
             <div class="relative flex items-center justify-center gap-1" #filterContainer>
               <span>{{ t().reports.table.finalStock }}</span>
               <button (click)="toggleFilterDropdown('stockFinal')" class="p-0.5 rounded"

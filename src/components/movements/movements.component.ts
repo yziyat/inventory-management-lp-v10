@@ -60,6 +60,7 @@ export class MovementsComponent {
   isSingleFormVisible = signal(false);
   isBulkFormVisible = signal(false);
   isFixedBulkFormVisible = signal(false);
+  isFixedBulkFormCollapsed = signal(false);
 
   // Sorting
   sortKey = signal('id');

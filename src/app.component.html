@@ -2,24 +2,51 @@
 <div class="lg:flex h-screen bg-gray-50">
   <!-- Sidebar -->
   <aside
-    class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white flex flex-col z-40 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0"
-    [class.translate-x-0]="isMobileMenuOpen()" [class.-translate-x-full]="!isMobileMenuOpen()">
+    class="fixed inset-y-0 left-0 bg-gray-900 text-white flex flex-col z-40 transform transition-all duration-300 ease-in-out lg:relative lg:translate-x-0"
+    [class.translate-x-0]="isMobileMenuOpen()" [class.-translate-x-full]="!isMobileMenuOpen()"
+    [class.w-64]="isSidebarExpanded()" [class.w-20]="!isSidebarExpanded()" (mouseenter)="isSidebarHovered.set(true)"
+    (mouseleave)="isSidebarHovered.set(false)">
 
-    <div class="flex items-center h-20 px-6 border-b border-gray-700">
+    <!-- Header -->
+    <div class="flex items-center h-20 px-6 border-b border-gray-700 overflow-hidden whitespace-nowrap relative">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-        class="w-6 h-6 mr-3 text-sky-400">
+        class="w-8 h-8 min-w-[2rem] text-sky-400 transition-all duration-300" [class.mr-3]="isSidebarExpanded()"
+        [class.mx-auto]="!isSidebarExpanded()">
         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
       </svg>
-      <span class="text-xl font-semibold text-white">Inventory LP</span>
+      <span class="text-xl font-semibold text-white transition-opacity duration-300"
+        [class.opacity-100]="isSidebarExpanded()" [class.opacity-0]="!isSidebarExpanded()"
+        [class.w-0]="!isSidebarExpanded()" [class.hidden]="!isSidebarExpanded()">
+        Inventory LP
+      </span>
+
+      <!-- Pin Button (Desktop only) -->
+      @if (isSidebarExpanded()) {
+      <button (click)="isSidebarPinned.set(!isSidebarPinned())"
+        class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-white rounded-md hover:bg-gray-800 hidden lg:block"
+        [title]="isSidebarPinned() ? 'Unpin Sidebar' : 'Pin Sidebar'">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="w-4 h-4">
+          @if (isSidebarPinned()) {
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+          } @else {
+          <path stroke-linecap="round" stroke-linejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5" />
+          }
+        </svg>
+      </button>
+      }
     </div>
 
-    <nav class="flex-1 px-4 py-4">
+    <nav class="flex-1 px-3 py-4 space-y-1 overflow-x-hidden">
       @for (item of navItems(); track item.path) {
       <a [routerLink]="item.path" routerLinkActive="bg-sky-600/30 text-white" [routerLinkActiveOptions]="{exact: true}"
         (click)="isMobileMenuOpen.set(false)"
-        class="flex items-center px-4 py-2.5 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors duration-200 rounded-lg">
+        class="flex items-center px-3 py-2.5 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors duration-200 rounded-lg group whitespace-nowrap"
+        [title]="!isSidebarExpanded() ? getNavLabel(item.label) : ''">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-          class="w-6 h-6 mr-3">
+          class="w-6 h-6 min-w-[1.5rem] transition-all duration-300" [class.mr-3]="isSidebarExpanded()"
+          [class.mx-auto]="!isSidebarExpanded()">
           @switch (item.icon) {
           @case ('archive-box') {
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -49,23 +76,31 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /> }
           }
         </svg>
-        <span>{{ getNavLabel(item.label) }}</span>
+        <span class="transition-opacity duration-300" [class.opacity-100]="isSidebarExpanded()"
+          [class.opacity-0]="!isSidebarExpanded()" [class.w-0]="!isSidebarExpanded()"
+          [class.hidden]="!isSidebarExpanded()">
+          {{ getNavLabel(item.label) }}
+        </span>
       </a>
       }
     </nav>
     <!-- User menu -->
-    <div class="p-4 border-t border-gray-700">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-sky-600 flex items-center justify-center font-bold text-white">
+    <div class="p-4 border-t border-gray-700 overflow-hidden whitespace-nowrap">
+      <div class="flex items-center gap-3" [class.justify-center]="!isSidebarExpanded()">
+        <div
+          class="w-10 h-10 min-w-[2.5rem] rounded-full bg-sky-600 flex items-center justify-center font-bold text-white">
           {{ authService.currentUser()?.firstName?.charAt(0)?.toUpperCase() }}
         </div>
-        <div class="flex-1 overflow-hidden">
+        <div class="flex-1 overflow-hidden transition-opacity duration-300" [class.opacity-100]="isSidebarExpanded()"
+          [class.opacity-0]="!isSidebarExpanded()" [class.w-0]="!isSidebarExpanded()"
+          [class.hidden]="!isSidebarExpanded()">
           <p class="font-semibold truncate text-white">{{ authService.currentUser()?.firstName }} {{
             authService.currentUser()?.lastName }}</p>
           <p class="text-xs text-gray-400 capitalize truncate">{{ authService.currentUser()?.username }} ({{
             authService.currentUser()?.role }})</p>
         </div>
-        <button (click)="logout()" title="Logout" class="text-gray-500 hover:text-sky-400 transition-colors">
+        <button (click)="logout()" title="Logout" class="text-gray-500 hover:text-sky-400 transition-colors"
+          [class.hidden]="!isSidebarExpanded()">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
             stroke="currentColor" class="w-6 h-6">
             <path stroke-linecap="round" stroke-linejoin="round"

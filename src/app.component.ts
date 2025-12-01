@@ -24,6 +24,11 @@ export class AppComponent {
   pageTitle = signal('');
   currentRoute = signal('');
 
+  // Sidebar state
+  isSidebarPinned = signal(true);
+  isSidebarHovered = signal(false);
+  isSidebarExpanded = computed(() => this.isSidebarPinned() || this.isSidebarHovered());
+
   private allNavItems = [
     { path: '/stock', label: 'Stock', icon: 'archive-box', adminOnly: false },
     { path: '/articles', label: 'Articles', icon: 'document-duplicate', adminOnly: false },
