@@ -2,10 +2,10 @@
 <div class="lg:flex h-screen bg-gray-50">
   <!-- Sidebar -->
   <aside
-    class="inset-y-0 left-0 bg-gray-900 text-white flex flex-col z-40 transform transition-all duration-300 ease-in-out lg:translate-x-0"
-    [class.fixed]="!isSidebarPinned() && isSidebarHovered()" [class.lg:fixed]="!isSidebarPinned() && isSidebarHovered()"
-    [class.lg:relative]="isSidebarPinned() || !isSidebarHovered()" [class.fixed]="isMobileMenuOpen()"
-    [class.translate-x-0]="isMobileMenuOpen()" [class.-translate-x-full]="!isMobileMenuOpen()"
+    class="inset-y-0 left-0 bg-gray-900 text-white flex flex-col z-40 transform transition-all duration-300 ease-in-out"
+    [class.fixed]="!isSidebarPinned() || isMobileMenuOpen()" [class.lg:relative]="isSidebarPinned()"
+    [class.lg:fixed]="!isSidebarPinned()" [class.translate-x-0]="isMobileMenuOpen()"
+    [class.-translate-x-full]="!isMobileMenuOpen() && !isSidebarPinned()" [class.lg:translate-x-0]="true"
     [class.w-64]="isSidebarExpanded()" [class.w-20]="!isSidebarExpanded()"
     [class.shadow-2xl]="!isSidebarPinned() && isSidebarHovered()" (mouseenter)="isSidebarHovered.set(true)"
     (mouseleave)="isSidebarHovered.set(false)">

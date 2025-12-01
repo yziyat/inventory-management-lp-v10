@@ -59,9 +59,7 @@ export class MovementsComponent {
   // Form visibility
   isSingleFormVisible = signal(false);
   isBulkFormVisible = signal(false);
-  isBulkFormCollapsed = signal(true); // Collapsed by default
   isFixedBulkFormVisible = signal(false);
-  isFixedBulkFormCollapsed = signal(true); // Collapsed by default
 
   // Sorting
   sortKey = signal('id');

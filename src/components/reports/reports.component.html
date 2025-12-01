@@ -247,13 +247,13 @@
             t().reports.table.totalIn }}</th>
           <th scope="col" class="px-3 py-3 text-center bg-red-700 whitespace-normal break-words">{{
             t().reports.table.totalOut }}</th>
-          <th scope="col" class="px-3 py-3 text-center bg-gray-700 whitespace-normal break-words">{{
-            t().reports.table.totalExpired }}</th>
           @for(dest of reportDestinations(); track dest) {
           <th scope="col" class="px-3 py-3 text-center bg-red-800 whitespace-normal break-words">{{ dest }}</th>
           }
           <th scope="col" class="px-3 py-3 text-center bg-amber-600 whitespace-normal break-words">{{
             t().reports.table.totalAdjustment }}</th>
+          <th scope="col" class="px-3 py-3 text-center bg-gray-700 whitespace-normal break-words">{{
+            t().reports.table.totalExpired }}</th>
           <th scope="col" class="px-3 py-3 text-center bg-indigo-900 rounded-tr-lg whitespace-normal break-words">
             <div class="relative flex items-center justify-center gap-1" #filterContainer>
               <span>{{ t().reports.table.finalStock }}</span>
@@ -311,7 +311,6 @@
             }
           </td>
           <td class="px-3 py-3 text-center text-red-600 bg-red-50 font-semibold">{{ row.totalOut }}</td>
-          <td class="px-3 py-3 text-center text-gray-700 bg-gray-100 font-semibold">{{ row.totalExpired }}</td>
           @for(dest of reportDestinations(); track dest) {
           <td class="px-3 py-3 text-center text-red-600 bg-red-50">
             @if (row.destinations[dest] > 0) {
@@ -327,6 +326,7 @@
             [class.bg-red-50]="row.totalAdjustment < 0" [class.text-gray-600]="row.totalAdjustment === 0">
             {{ row.totalAdjustment > 0 ? '+' + row.totalAdjustment : row.totalAdjustment }}
           </td>
+          <td class="px-3 py-3 text-center text-gray-700 bg-gray-100 font-semibold">{{ row.totalExpired }}</td>
           <td class="px-3 py-3 text-center font-bold text-indigo-700">{{ row.stockFinal }}</td>
         </tr>
         }
