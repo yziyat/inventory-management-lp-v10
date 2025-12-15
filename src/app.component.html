@@ -5,15 +5,14 @@
     class="inset-y-0 left-0 bg-gray-900 text-white flex flex-col z-40 transform transition-all duration-300 ease-in-out"
     [class.fixed]="!isSidebarPinned() || isMobileMenuOpen()" [class.lg:relative]="isSidebarPinned()"
     [class.lg:fixed]="!isSidebarPinned()" [class.translate-x-0]="isMobileMenuOpen()"
-    [class.-translate-x-full]="!isMobileMenuOpen()" [class.lg:translate-x-0]="true"
-    [class.w-64]="isSidebarExpanded()" [class.w-20]="!isSidebarExpanded()"
-    [class.shadow-2xl]="!isSidebarPinned() && isSidebarHovered()" (mouseenter)="isSidebarHovered.set(true)"
-    (mouseleave)="isSidebarHovered.set(false)">
+    [class.-translate-x-full]="!isMobileMenuOpen()" [class.lg:translate-x-0]="true" [class.w-64]="isSidebarExpanded()"
+    [class.w-20]="!isSidebarExpanded()" [class.shadow-2xl]="!isSidebarPinned() && isSidebarHovered()"
+    (mouseenter)="isSidebarHovered.set(true)" (mouseleave)="isSidebarHovered.set(false)">
 
     <!-- Header -->
     <div class="flex items-center h-20 px-6 border-b border-gray-700 overflow-hidden whitespace-nowrap relative">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-        class="w-8 h-8 min-w-[2rem] text-sky-400 transition-all duration-300" [class.mr-3]="isSidebarExpanded()"
+        class="w-7 h-7 min-w-[1.75rem] text-sky-400 transition-all duration-300" [class.mr-3]="isSidebarExpanded()"
         [class.mx-auto]="!isSidebarExpanded()">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
