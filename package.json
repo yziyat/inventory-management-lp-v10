@@ -22,7 +22,9 @@
     "xlsx": "^0.18.5",
     "d3": "^7.9.0",
     "firebase": "^10.7.0",
-    "@angular/fire": "^18.0.0"
+    "@angular/fire": "^18.0.0",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.0.0",
