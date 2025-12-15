@@ -251,12 +251,19 @@ export class ApiService {
   }
 
   async addMovement(movement: Omit<Movement, 'id'>): Promise<Movement> {
+    // Validation: Quantities must be positive for non-adjustments
+    if (movement.type !== 'Ajustement' && movement.quantity <= 0) {
+      throw new Error("Quantity must be positive for " + movement.type);
+    }
+
     const effect = this.getStockEffect(movement);
-    // Do not check for sufficient stock on 'Ajustement' type movements
-    if (effect < 0 && movement.type !== 'Ajustement') {
+
+    // Check for negative stock
+    if (effect < 0) {
       const stockItem = this.stock().find(s => s.id === movement.articleId);
       const currentStock = stockItem?.currentStock || 0;
       const quantityToWithdraw = Math.abs(effect);
+
       if (currentStock < quantityToWithdraw) {
         const articleName = this._articles().find(a => a.id === movement.articleId)?.name || 'the article';
         throw new ApiError('INSUFFICIENT_STOCK', {
@@ -281,11 +288,17 @@ export class ApiService {
     const originalEffect = this.getStockEffect(originalMovement);
     const updatedEffect = this.getStockEffect(updatedMovement);
 
+    if (updatedMovement.type !== 'Ajustement' && updatedMovement.quantity <= 0) {
+      throw new Error("Quantity must be positive for " + updatedMovement.type);
+    }
+
     if (originalMovement.articleId === updatedMovement.articleId) {
       const stock = this.stock().find(s => s.id === updatedMovement.articleId)!;
       const stockWithoutOriginal = stock.currentStock - originalEffect;
-      if (updatedMovement.type !== 'Ajustement' && stockWithoutOriginal + updatedEffect < 0) {
+
+      if (stockWithoutOriginal + updatedEffect < 0) {
         const articleName = stock.name;
+        // Revert check logic: if adjustment makes checks difficult, just ensure final state is >= 0
         throw new ApiError('INSUFFICIENT_STOCK', {
           articleName,
           available: stockWithoutOriginal,
@@ -295,7 +308,7 @@ export class ApiService {
     } else {
       // Check new article
       const newArticleStock = this.stock().find(s => s.id === updatedMovement.articleId)!;
-      if (updatedMovement.type !== 'Ajustement' && newArticleStock.currentStock + updatedEffect < 0) {
+      if (newArticleStock.currentStock + updatedEffect < 0) {
         const articleName = newArticleStock.name;
         throw new ApiError('INSUFFICIENT_STOCK', {
           articleName,

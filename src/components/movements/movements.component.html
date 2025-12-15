@@ -3,7 +3,7 @@
 
   @if (authService.isAdmin() || authService.isEditor()) {
   <div class="flex flex-col sm:flex-row items-center gap-4">
-    <button (click)="isSingleFormVisible.set(!isSingleFormVisible())"
+    <button (click)="toggleSingleForm()"
       class="w-full sm:w-auto flex-1 px-4 py-2.5 bg-sky-600 text-white font-semibold rounded-md hover:bg-sky-700 transition-colors shadow-sm text-sm flex items-center justify-center gap-2">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
         class="w-5 h-5">
@@ -11,7 +11,7 @@
       </svg>
       {{ t().movements.recordMovement }}
     </button>
-    <button (click)="isBulkFormVisible.set(!isBulkFormVisible())"
+    <button (click)="toggleBulkForm()"
       class="w-full sm:w-auto flex-1 px-4 py-2.5 bg-teal-600 text-white font-semibold rounded-md hover:bg-teal-700 transition-colors shadow-sm text-sm flex items-center justify-center gap-2">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
         class="w-5 h-5">
@@ -20,7 +20,7 @@
       </svg>
       {{ t().movements.bulkForm.title }}
     </button>
-    <button (click)="isFixedBulkFormVisible.set(!isFixedBulkFormVisible())"
+    <button (click)="toggleFixedBulkForm()"
       class="w-full sm:w-auto flex-1 px-4 py-2.5 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors shadow-sm text-sm flex items-center justify-center gap-2">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
         class="w-5 h-5">
@@ -115,7 +115,7 @@
           class="flex-grow px-4 py-2.5 bg-sky-600 text-white font-semibold rounded-md hover:bg-sky-700 disabled:bg-sky-300 transition-colors shadow-sm text-sm">
           {{ t().movements.saveMovement }}
         </button>
-        <button type="button" (click)="isSingleFormVisible.set(false)"
+        <button type="button" (click)="toggleSingleForm()"
           class="px-4 py-2.5 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors text-sm">
           {{ t().common.cancel }}
         </button>
@@ -183,7 +183,22 @@
               }
             </select>
           </div>
-          <div class="col-span-full md:col-span-5">
+          @if (bulkMovementForm.get('type')?.value === 'Sortie' || bulkMovementForm.get('type')?.value === 'Périmé /
+          Rebut') {
+          <div class="col-span-full md:col-span-3">
+            <label class="block text-xs font-medium text-gray-700 mb-1">{{ t().movements.form.subcategory.label
+              }}</label>
+            <select formControlName="subcategory" class="w-full p-2 border border-gray-300 rounded-md text-sm bg-white">
+              <option value="">{{ t().movements.form.subcategory.placeholder }}</option>
+              @for (sub of outgoingSubcategories(); track sub) {
+              <option [value]="sub">{{ sub }}</option>
+              }
+            </select>
+          </div>
+          }
+          <div class="col-span-full"
+            [class.md:col-span-2]="bulkMovementForm.get('type')?.value === 'Sortie' || bulkMovementForm.get('type')?.value === 'Périmé / Rebut'"
+            [class.md:col-span-5]="!(bulkMovementForm.get('type')?.value === 'Sortie' || bulkMovementForm.get('type')?.value === 'Périmé / Rebut')">
             <label class="block text-xs font-medium text-gray-700 mb-1">{{ t().movements.form.remarks.label }}</label>
             <input type="text" formControlName="remarks" class="w-full p-2 border border-gray-300 rounded-md text-sm">
           </div>
@@ -217,7 +232,7 @@
           {{ t().movements.bulkForm.addRow }}
         </button>
         <div class="flex items-center gap-2">
-          <button type="button" (click)="isBulkFormVisible.set(false)"
+          <button type="button" (click)="toggleBulkForm()"
             class="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors text-sm">
             {{ t().common.cancel }}
           </button>
@@ -243,7 +258,7 @@
     </div>
     <form [formGroup]="fixedBulkMovementForm" (ngSubmit)="onFixedBulkSubmit()">
       <!-- Common fields: Type, Date, Destination, Ref Doc -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 p-4 bg-indigo-50 rounded-lg">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6 p-4 bg-indigo-50 rounded-lg">
         <div>
           <label for="fixed-bulk-type" class="block mb-2 text-sm font-medium text-gray-900">{{
             t().movements.form.type.label }}</label>
@@ -271,6 +286,22 @@
             }
           </select>
         </div>
+
+        @if (fixedBulkMovementForm.get('type')?.value === 'Sortie' || fixedBulkMovementForm.get('type')?.value ===
+        'Périmé / Rebut') {
+        <div>
+          <label for="fixed-bulk-sub" class="block mb-2 text-sm font-medium text-gray-900">{{
+            t().movements.form.subcategory.label }}</label>
+          <select id="fixed-bulk-sub" formControlName="subcategory"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
+            <option value="">{{ t().movements.form.subcategory.placeholder }}</option>
+            @for (sub of outgoingSubcategories(); track sub) {
+            <option [value]="sub">{{ sub }}</option>
+            }
+          </select>
+        </div>
+        }
+
         <div>
           <label for="fixed-bulk-ref" class="block mb-2 text-sm font-medium text-gray-900">{{
             t().movements.form.refDoc.label }}</label>
@@ -297,8 +328,26 @@
           @for (movement of fixedBulkMovementsArray.controls; track $index) {
           <div [formGroupName]="$index"
             class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end p-3 bg-gray-50 rounded-lg">
+            <!-- Subcategory -->
+            @if (fixedBulkMovementForm.get('type')?.value === 'Sortie' || fixedBulkMovementForm.get('type')?.value ===
+            'Périmé / Rebut') {
+            <div class="md:col-span-3">
+              <label class="block mb-1 text-xs font-medium text-gray-700">{{ t().movements.form.subcategory.label
+                }}</label>
+              <select formControlName="subcategory"
+                class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2">
+                <option value="">{{ t().movements.form.subcategory.placeholder }}</option>
+                @for (sub of outgoingSubcategories(); track sub) {
+                <option [value]="sub">{{ sub }}</option>
+                }
+              </select>
+            </div>
+            }
+
             <!-- Article -->
-            <div class="md:col-span-5">
+            <div
+              [class.md:col-span-4]="fixedBulkMovementForm.get('type')?.value === 'Sortie' || fixedBulkMovementForm.get('type')?.value === 'Périmé / Rebut'"
+              [class.md:col-span-5]="!(fixedBulkMovementForm.get('type')?.value === 'Sortie' || fixedBulkMovementForm.get('type')?.value === 'Périmé / Rebut')">
               <label class="block mb-1 text-xs font-medium text-gray-700">{{ t().movements.form.article.label }}</label>
               <app-searchable-select formControlName="articleId" [options]="searchableArticles()"
                 [placeholder]="t().movements.form.article.placeholder">
@@ -313,7 +362,7 @@
             </div>
 
             <!-- Remarks -->
-            <div class="md:col-span-4">
+            <div class="md:col-span-3">
               <label class="block mb-1 text-xs font-medium text-gray-700">{{ t().movements.bulkForm.remarks }}</label>
               <input type="text" formControlName="remarks"
                 class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2">
@@ -337,7 +386,7 @@
 
       <!-- Submit buttons -->
       <div class="flex gap-2 justify-end">
-        <button type="button" (click)="isFixedBulkFormVisible.set(false)"
+        <button type="button" (click)="toggleFixedBulkForm()"
           class="px-4 py-2.5 bg-gray-200 text-gray-800 font-semibold rounded-md hover:bg-gray-300 transition-colors text-sm">
           {{ t().movements.bulkForm.cancel }}
         </button>

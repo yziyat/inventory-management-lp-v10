@@ -1,6 +1,5 @@
-import { Injectable } from '@angular/core';
-
-import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Injectable({ providedIn: 'root' })
 export class ExportService {
@@ -15,6 +14,25 @@ export class ExportService {
 
     const fileName = `${fileNamePrefix}_${this.getFormattedTimestamp()}.xlsx`;
     XLSX.writeFile(wb, fileName);
+  }
+
+  exportToPdf(data: any[], fileNamePrefix: string): void {
+    if (!data || data.length === 0) return;
+
+    const doc = new jsPDF();
+    const headers = Object.keys(data[0]);
+    const rows = data.map(row => Object.values(row));
+
+    autoTable(doc, {
+      head: [headers],
+      body: rows,
+      theme: 'grid',
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: [22, 163, 74] }, // Green color to match app theme
+    });
+
+    const fileName = `${fileNamePrefix}_${this.getFormattedTimestamp()}.pdf`;
+    doc.save(fileName);
   }
 
   private autoFitColumns(ws: any, data: any[]) {

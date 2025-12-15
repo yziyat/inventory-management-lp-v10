@@ -77,6 +77,8 @@ export class ReportsComponent implements OnInit, OnDestroy {
   });
   appliedDailyLogFilters = signal(this.dailyLogFiltersForm.value);
 
+  // Export menu state
+  isExportMenuOpen = signal(false);
 
   // Column filtering state
   activeFilterDropdown = signal<string | null>(null);
@@ -106,6 +108,15 @@ export class ReportsComponent implements OnInit, OnDestroy {
       const clickedInside = this.filterContainers().some(ref => ref.nativeElement.contains(event.target));
       if (!clickedInside) {
         this.activeFilterDropdown.set(null);
+      }
+    }
+
+    // Close export menu if clicked outside
+    if (this.isExportMenuOpen()) {
+      const exportButton = document.getElementById('export-button');
+      const exportMenu = document.getElementById('export-menu');
+      if (exportButton && !exportButton.contains(event.target as Node) && exportMenu && !exportMenu.contains(event.target as Node)) {
+        this.isExportMenuOpen.set(false);
       }
     }
   }
@@ -322,13 +333,25 @@ export class ReportsComponent implements OnInit, OnDestroy {
     const mainReport = this.displayReportData();
 
     if (mainReport && mainReport.length > 0) {
-      this.exportMainReport(mainReport);
+      this.exportMainReport(mainReport, 'excel');
     } else {
       this.notificationService.showWarning(this.translationService.translate('common.noDataToExport'));
     }
+    this.isExportMenuOpen.set(false);
   }
 
-  private exportMainReport(data: DetailedReportRow[]) {
+  exportToPdf() {
+    const mainReport = this.displayReportData();
+
+    if (mainReport && mainReport.length > 0) {
+      this.exportMainReport(mainReport, 'pdf');
+    } else {
+      this.notificationService.showWarning(this.translationService.translate('common.noDataToExport'));
+    }
+    this.isExportMenuOpen.set(false);
+  }
+
+  private exportMainReport(data: DetailedReportRow[], format: 'excel' | 'pdf') {
     const destinations = this.reportDestinations();
     const t = this.t();
     const dataToExport = data.map(row => {
@@ -347,7 +370,12 @@ export class ReportsComponent implements OnInit, OnDestroy {
       exportedRow[t.reports.table.finalStock] = row.stockFinal;
       return exportedRow;
     });
-    this.exportService.exportToExcel(dataToExport, 'Report_Stock_Movement');
+
+    if (format === 'excel') {
+      this.exportService.exportToExcel(dataToExport, 'Report_Stock_Movement');
+    } else {
+      this.exportService.exportToPdf(dataToExport, 'Report_Stock_Movement');
+    }
   }
 
   toggleFilterDropdown(column: keyof ReportFilters | null) {

@@ -20,6 +20,7 @@ import { SearchableSelectComponent } from '../shared/searchable-select.component
 interface BulkMovementRow {
   quantity: number;
   supplierDest: string;
+  subcategory: string;
   remarks: string;
 }
 
@@ -57,9 +58,11 @@ export class MovementsComponent {
   selectedArticle = signal<Article | null>(null);
 
   // Form visibility
-  isSingleFormVisible = signal(false);
-  isBulkFormVisible = signal(false);
-  isFixedBulkFormVisible = signal(false);
+  activeForm = signal<'single' | 'bulk' | 'fixed' | null>(null);
+
+  isSingleFormVisible = computed(() => this.activeForm() === 'single');
+  isBulkFormVisible = computed(() => this.activeForm() === 'bulk');
+  isFixedBulkFormVisible = computed(() => this.activeForm() === 'fixed');
 
   // Sorting
   sortKey = signal('id');
@@ -130,6 +133,7 @@ export class MovementsComponent {
     type: ['Sortie' as MovementType, Validators.required],
     date: [this.today, Validators.required],
     supplierDest: ['', Validators.required],
+    subcategory: [''],
     refDoc: [''],
     movements: this.fb.array([this.createFixedBulkMovementRow()])
   });
@@ -182,6 +186,7 @@ export class MovementsComponent {
   createBulkMovementRow(): FormGroup {
     return this.fb.group({
       supplierDest: ['', Validators.required],
+      subcategory: [''],
       quantity: [1, [Validators.required, Validators.min(1)]],
       remarks: ['']
     });
@@ -320,9 +325,17 @@ export class MovementsComponent {
       if (type) {
         this.bulkMovementType.set(type);
       }
+      this.updateBulkFormValidators(type);
       this.bulkMovementsArray.controls.forEach(control => {
         control.get('supplierDest')?.reset('');
+        control.get('subcategory')?.reset('');
       });
+    });
+
+    this.fixedBulkMovementForm.get('type')?.valueChanges.subscribe(type => {
+      this.updateFixedBulkFormValidators(type);
+      this.fixedBulkMovementForm.get('supplierDest')?.reset('');
+      this.fixedBulkMovementForm.get('subcategory')?.reset('');
     });
 
     this.movementForm.get('articleId')?.valueChanges.subscribe(id => {
@@ -345,9 +358,21 @@ export class MovementsComponent {
 
     if (type === 'Sortie' || type === 'Périmé / Rebut') {
       subcategoryControl.enable();
+      if (type === 'Sortie') {
+        subcategoryControl.setValidators(Validators.required);
+        supplierDestControl.setValidators(Validators.required);
+      } else {
+        subcategoryControl.clearValidators();
+        supplierDestControl.clearValidators();
+      }
     } else {
       subcategoryControl.disable();
+      subcategoryControl.clearValidators();
       subcategoryControl.reset('');
+
+      if (type !== 'Ajustement') {
+        supplierDestControl.setValidators(Validators.required);
+      }
     }
 
     if (type === 'Ajustement') {
@@ -364,6 +389,64 @@ export class MovementsComponent {
     quantityControl.updateValueAndValidity();
     supplierDestControl.updateValueAndValidity();
     subcategoryControl.updateValueAndValidity();
+  }
+
+  private updateBulkFormValidators(type: Movement['type'] | null | undefined) {
+    if (!type) return;
+
+    const isOutgoing = type === 'Sortie' || type === 'Périmé / Rebut';
+
+    this.bulkMovementsArray.controls.forEach(control => {
+      const subcategoryControl = control.get('subcategory');
+      const supplierDestControl = control.get('supplierDest');
+
+      if (isOutgoing) {
+        subcategoryControl?.enable();
+        if (type === 'Sortie') {
+          subcategoryControl?.setValidators(Validators.required);
+          supplierDestControl?.setValidators(Validators.required);
+        } else {
+          subcategoryControl?.clearValidators();
+          supplierDestControl?.clearValidators();
+        }
+      } else {
+        subcategoryControl?.disable();
+        subcategoryControl?.clearValidators();
+      }
+      subcategoryControl?.updateValueAndValidity();
+      supplierDestControl?.updateValueAndValidity();
+    });
+  }
+
+  private updateFixedBulkFormValidators(type: Movement['type'] | null | undefined) {
+    const subcategoryControl = this.fixedBulkMovementForm.get('subcategory');
+    const supplierDestControl = this.fixedBulkMovementForm.get('supplierDest');
+
+    if (!subcategoryControl || !supplierDestControl) return;
+
+    if (type === 'Sortie' || type === 'Périmé / Rebut') {
+      subcategoryControl.enable();
+      if (type === 'Sortie') {
+        subcategoryControl.setValidators(Validators.required);
+        supplierDestControl.setValidators(Validators.required);
+      } else {
+        subcategoryControl.clearValidators();
+        supplierDestControl.clearValidators();
+      }
+    } else if (type === 'Ajustement') {
+      subcategoryControl.disable();
+      subcategoryControl.clearValidators();
+      supplierDestControl.disable();
+      supplierDestControl.clearValidators();
+    } else {
+      // Entrée
+      subcategoryControl.disable();
+      subcategoryControl.clearValidators();
+      supplierDestControl.enable();
+      supplierDestControl.setValidators(Validators.required);
+    }
+    subcategoryControl.updateValueAndValidity();
+    supplierDestControl.updateValueAndValidity();
   }
 
   setItemsPerPage(count: number) {
@@ -403,23 +486,44 @@ export class MovementsComponent {
   }
 
   toggleSingleForm() {
-    this.isSingleFormVisible.update(v => !v);
-    this.isBulkFormVisible.set(false);
+    this.activeForm.update(current => current === 'single' ? null : 'single');
     if (this.isSingleFormVisible()) {
       this.resetMovementForm();
     }
   }
 
   toggleBulkForm() {
-    this.isBulkFormVisible.update(v => !v);
-    this.isSingleFormVisible.set(false);
+    this.activeForm.update(current => current === 'bulk' ? null : 'bulk');
     if (this.isBulkFormVisible()) {
       this.resetBulkForm();
     }
   }
 
+  toggleFixedBulkForm() {
+    this.activeForm.update(current => current === 'fixed' ? null : 'fixed');
+    if (this.isFixedBulkFormVisible()) {
+      this.resetFixedBulkForm();
+    }
+  }
+
   addBulkMovementRow() {
-    this.bulkMovementsArray.push(this.createBulkMovementRow());
+    const row = this.createBulkMovementRow();
+    // Apply current validators to new row
+    const type = this.bulkMovementForm.get('type')?.value;
+    const subcategoryControl = row.get('subcategory');
+    const supplierDestControl = row.get('supplierDest');
+
+    if (type === 'Sortie' || type === 'Périmé / Rebut') {
+      subcategoryControl?.enable();
+      if (type === 'Sortie') {
+        subcategoryControl?.setValidators(Validators.required);
+        supplierDestControl?.setValidators(Validators.required);
+      }
+    } else {
+      subcategoryControl?.disable();
+    }
+
+    this.bulkMovementsArray.push(row);
   }
 
   removeBulkMovementRow(index: number) {
@@ -473,11 +577,13 @@ export class MovementsComponent {
       type: 'Sortie',
       date: this.today,
       supplierDest: '',
+      subcategory: '',
       refDoc: '',
       movements: []
     });
     this.fixedBulkMovementsArray.clear();
     this.addFixedBulkMovementRow();
+    this.updateFixedBulkFormValidators('Sortie'); // Default type is Sortie
   }
 
   handleSort(key: string) {
@@ -586,6 +692,7 @@ export class MovementsComponent {
             type: bulkFormValue.type!,
             quantity: m.quantity,
             supplierDest: m.supplierDest,
+            subcategory: m.subcategory,
             refDoc: '',
             remarks: m.remarks
           };
@@ -654,6 +761,7 @@ export class MovementsComponent {
           type: formValue.type!,
           quantity: m.quantity,
           supplierDest: formValue.supplierDest!,
+          subcategory: formValue.subcategory || '',
           refDoc: formValue.refDoc || '',
           remarks: m.remarks || ''
         };
@@ -667,7 +775,7 @@ export class MovementsComponent {
         `${movementsAdded} mouvements ajoutés avec succès`
       );
       this.resetFixedBulkForm();
-      this.isFixedBulkFormVisible.set(false);
+      this.activeForm.set(null);
     } catch (error) {
       console.error('Error adding fixed bulk movements:', error);
       this.notificationService.showError(this.t().common.error);

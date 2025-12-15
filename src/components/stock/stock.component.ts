@@ -55,6 +55,7 @@ export class StockComponent {
   filterCategory = signal('');
   showLowStockOnly = signal(false);
   showOutOfStockOnly = signal(false);
+  showInStockOnly = signal(false);
 
   // Pagination
   itemsPerPage = signal(100);
@@ -66,10 +67,11 @@ export class StockComponent {
     const category = this.filterCategory();
     const lowStockOnly = this.showLowStockOnly();
     const outOfStockOnly = this.showOutOfStockOnly();
+    const inStockOnly = this.showInStockOnly();
     const key = this.sortKey();
     const dir = this.sortDirection();
 
-    const stockStatusFilterActive = lowStockOnly || outOfStockOnly;
+    const stockStatusFilterActive = lowStockOnly || outOfStockOnly || inStockOnly;
 
     return stock
       .filter(s =>
@@ -77,7 +79,8 @@ export class StockComponent {
         (category === '' || s.category === category) &&
         (!stockStatusFilterActive ||
           (lowStockOnly && s.currentStock <= s.alert && s.alert > 0) ||
-          (outOfStockOnly && s.currentStock === 0))
+          (outOfStockOnly && s.currentStock === 0) ||
+          (inStockOnly && s.currentStock > 0))
       )
       .sort((a, b) => {
         const valA = a[key as keyof typeof a];
@@ -174,11 +177,17 @@ export class StockComponent {
     this.currentPage.set(1);
   }
 
+  onInStockToggle(event: Event) {
+    this.showInStockOnly.set((event.target as HTMLInputElement).checked);
+    this.currentPage.set(1);
+  }
+
   resetFilters() {
     this.searchTerm.set('');
     this.filterCategory.set('');
     this.showLowStockOnly.set(false);
     this.showOutOfStockOnly.set(false);
+    this.showInStockOnly.set(false);
     this.currentPage.set(1);
 
     const lowStockCheckbox = document.getElementById('low-stock-checkbox') as HTMLInputElement;
@@ -186,6 +195,9 @@ export class StockComponent {
 
     const outOfStockCheckbox = document.getElementById('out-of-stock-checkbox') as HTMLInputElement;
     if (outOfStockCheckbox) outOfStockCheckbox.checked = false;
+
+    const inStockCheckbox = document.getElementById('in-stock-checkbox') as HTMLInputElement;
+    if (inStockCheckbox) inStockCheckbox.checked = false;
   }
 
   exportToExcel() {
