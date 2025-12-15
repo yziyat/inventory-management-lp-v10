@@ -1,4 +1,4 @@
-<div class="space-y-6">
+﻿<div class="space-y-6">
   <h1 class="text-3xl font-bold text-gray-800">{{ t().movements.title }}</h1>
 
   @if (authService.isAdmin() || authService.isEditor()) {
@@ -183,8 +183,7 @@
               }
             </select>
           </div>
-          @if (bulkMovementForm.get('type')?.value === 'Sortie' || bulkMovementForm.get('type')?.value === 'Périmé /
-          Rebut') {
+          @if (bulkMovementForm.get('type')?.value === 'Sortie' || bulkMovementForm.get('type')?.value === 'Périmé / Rebut') {
           <div class="col-span-full md:col-span-3">
             <label class="block text-xs font-medium text-gray-700 mb-1">{{ t().movements.form.subcategory.label
               }}</label>
@@ -715,3 +714,4 @@
 </app-modal>
 
 <app-article-detail [article]="selectedArticle()" (close)="closeDetailModal()"></app-article-detail>
+
