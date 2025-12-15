@@ -25,7 +25,14 @@
             ],
             "allowedCommonJsDependencies": [
               "xlsx",
-              "d3"
+              "d3",
+              "canvg",
+              "html2canvas",
+              "dompurify",
+              "jspdf-autotable",
+              "raf",
+              "rgbcolor",
+              "core-js"
             ]
           },
           "configurations": {

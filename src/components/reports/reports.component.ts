@@ -4,6 +4,7 @@ import { ApiService } from '../../services/api.service';
 import { Movement } from '../../models/movement.model';
 import { TranslationService } from '../../services/translation.service';
 import { ExportService } from '../../services/export.service';
+import { AuthService } from '../../services/auth.service';
 import { CustomDatePipe } from '../../pipes/custom-date.pipe';
 import { NotificationService } from '../../services/notification.service';
 import { SearchableSelectComponent } from '../shared/searchable-select.component';
@@ -43,6 +44,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
   private fb: FormBuilder = inject(FormBuilder);
   private translationService = inject(TranslationService);
   private exportService = inject(ExportService);
+  private authService = inject(AuthService);
   private notificationService = inject(NotificationService);
   private renderer = inject(Renderer2);
   private documentClickListener!: () => void;
@@ -374,7 +376,15 @@ export class ReportsComponent implements OnInit, OnDestroy {
     if (format === 'excel') {
       this.exportService.exportToExcel(dataToExport, 'Report_Stock_Movement');
     } else {
-      this.exportService.exportToPdf(dataToExport, 'Report_Stock_Movement');
+      const { startDate, endDate } = this.filterForm.value;
+      const currentUser = this.authService.currentUser();
+      const userName = currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : '';
+
+      this.exportService.exportToPdf(dataToExport, 'Report_Stock_Movement', {
+        title: this.t().reports.title || 'Rapport de Stock',
+        user: userName,
+        period: `${startDate} - ${endDate}`
+      });
     }
   }
 
