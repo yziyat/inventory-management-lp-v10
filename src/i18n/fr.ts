@@ -7,7 +7,7 @@ export const fr = {
     deleteConfirmationTitle: 'Confirmer la suppression',
     cancel: 'Annuler',
     saveChanges: 'Enregistrer',
-    export: 'Exporter vers Excel',
+    export: 'Exporter',
     import: 'Importer',
     apply: 'Appliquer',
     noDataToExport: 'Aucune donnée à exporter.',

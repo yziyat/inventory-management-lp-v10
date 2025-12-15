@@ -11,6 +11,9 @@ export class ExportService {
     // Auto-fit column widths
     this.autoFitColumns(ws, data);
 
+    // Set page orientation to landscape
+    ws['!pageSetup'] = { orientation: 'landscape' };
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Data');
 

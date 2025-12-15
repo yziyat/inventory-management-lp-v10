@@ -183,7 +183,8 @@
               }
             </select>
           </div>
-          @if (bulkMovementForm.get('type')?.value === 'Sortie' || bulkMovementForm.get('type')?.value === 'Périmé / Rebut') {
+          @if (bulkMovementForm.get('type')?.value === 'Sortie' || bulkMovementForm.get('type')?.value === 'Périmé /
+          Rebut') {
           <div class="col-span-full md:col-span-3">
             <label class="block text-xs font-medium text-gray-700 mb-1">{{ t().movements.form.subcategory.label
               }}</label>
@@ -327,26 +328,8 @@
           @for (movement of fixedBulkMovementsArray.controls; track $index) {
           <div [formGroupName]="$index"
             class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end p-3 bg-gray-50 rounded-lg">
-            <!-- Subcategory -->
-            @if (fixedBulkMovementForm.get('type')?.value === 'Sortie' || fixedBulkMovementForm.get('type')?.value ===
-            'Périmé / Rebut') {
-            <div class="md:col-span-3">
-              <label class="block mb-1 text-xs font-medium text-gray-700">{{ t().movements.form.subcategory.label
-                }}</label>
-              <select formControlName="subcategory"
-                class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2">
-                <option value="">{{ t().movements.form.subcategory.placeholder }}</option>
-                @for (sub of outgoingSubcategories(); track sub) {
-                <option [value]="sub">{{ sub }}</option>
-                }
-              </select>
-            </div>
-            }
-
             <!-- Article -->
-            <div
-              [class.md:col-span-4]="fixedBulkMovementForm.get('type')?.value === 'Sortie' || fixedBulkMovementForm.get('type')?.value === 'Périmé / Rebut'"
-              [class.md:col-span-5]="!(fixedBulkMovementForm.get('type')?.value === 'Sortie' || fixedBulkMovementForm.get('type')?.value === 'Périmé / Rebut')">
+            <div class="md:col-span-5">
               <label class="block mb-1 text-xs font-medium text-gray-700">{{ t().movements.form.article.label }}</label>
               <app-searchable-select formControlName="articleId" [options]="searchableArticles()"
                 [placeholder]="t().movements.form.article.placeholder">
@@ -361,7 +344,7 @@
             </div>
 
             <!-- Remarks -->
-            <div class="md:col-span-3">
+            <div class="md:col-span-4">
               <label class="block mb-1 text-xs font-medium text-gray-700">{{ t().movements.bulkForm.remarks }}</label>
               <input type="text" formControlName="remarks"
                 class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2">
@@ -714,4 +697,3 @@
 </app-modal>
 
 <app-article-detail [article]="selectedArticle()" (close)="closeDetailModal()"></app-article-detail>
-
