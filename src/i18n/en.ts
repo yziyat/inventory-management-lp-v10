@@ -183,6 +183,7 @@ export const en = {
       allCategories: 'All Categories',
       lowStockOnly: 'Low stock items',
       outOfStockOnly: 'Out of stock items',
+      inStockOnly: 'In stock items',
     },
     table: {
       article: 'Article',

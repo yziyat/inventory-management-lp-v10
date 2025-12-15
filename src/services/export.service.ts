@@ -23,7 +23,7 @@ export class ExportService {
 
     const doc = new jsPDF();
     const headers = Object.keys(data[0]);
-    const rows = data.map(row => Object.values(row));
+    const rows = data.map(row => Object.values(row) as any[]);
 
     autoTable(doc, {
       head: [headers],
